@@ -1,6 +1,6 @@
 # vstack
 
-[**Blog**](https://haoailab.com/blogs/verifiable-llm-infra/) | [**X**](https://x.com/haoailab)
+[**Blog**](https://haoailab.com/blogs/verifiable-llm-infra/) | [**X**](https://x.com/haoailab/status/2120595980659917024)
 
 `vstack` is a formal verification workflow and skill stack for coding agents. It guides agents through **TLA+ (`TLC`, `Apalache`, `TLAPS`), `Z3`, and runtime trace validation** to uncover deep concurrency bugs and build provable state-machine cores in distributed systems.
 
