@@ -3,7 +3,7 @@
   "name": "vstack",
   "version": "0.1.0",
   "author": {
-    "name": "Hao AI Lab (Yuxuan Zhang, Yichao Fu, Minshen Zhang)"
+    "name": "Hao AI Lab"
   },
   "license": "MIT",
   "description": "Formal verification workflows for concurrent, distributed and systems software.",
