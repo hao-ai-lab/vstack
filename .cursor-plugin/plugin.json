@@ -1,0 +1,26 @@
+{
+  "name": "vstack",
+  "version": "0.1.0",
+  "author": {
+    "name": "Hao AI Lab (Yuxuan Zhang, Yichao Fu, Minshen Zhang)"
+  },
+  "license": "MIT",
+  "description": "Formal verification workflows for concurrent, distributed and systems software.",
+  "keywords": [
+    "vstack",
+    "formal-verification",
+    "tla-plus",
+    "model-checking",
+    "proof",
+    "trace-conformance"
+  ],
+  "displayName": "vstack",
+  "category": "developer-tools",
+  "tags": [
+    "verification",
+    "workflow",
+    "review"
+  ],
+  "skills": "./skills/",
+  "agents": "./agents/"
+}
