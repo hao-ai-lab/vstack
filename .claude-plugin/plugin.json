@@ -1,0 +1,18 @@
+{
+  "name": "vstack",
+  "version": "0.1.0",
+  "description": "Formal verification workflows and mechanical anti-reward-hacking gates for coding agents.",
+  "author": {
+    "name": "Hao AI Lab"
+  },
+  "repository": "https://github.com/hao-ai-lab/vstack",
+  "license": "MIT",
+  "keywords": [
+    "vstack",
+    "formal-verification",
+    "tla-plus",
+    "z3",
+    "tlaps",
+    "coding-agents"
+  ]
+}
