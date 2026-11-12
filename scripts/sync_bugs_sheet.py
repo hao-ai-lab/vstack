@@ -24,10 +24,10 @@ SYSTEM_BG = {
 
 SPEC_STYLE = {
     "Isolation": ("#FCE8E6", "#A50E0E"),
+    "Integrity": ("#E0F2FE", "#0369A1"),
     "Conservation": ("#FEF3C7", "#92400E"),
-    "Authority": ("#E0E7FF", "#3730A3"),
+    "Consensus": ("#E0E7FF", "#3730A3"),
     "Finality": ("#E8F0FE", "#1967D2"),
-    "Progress": ("#E0F2FE", "#0369A1"),
     "Invariance": ("#F3E8FD", "#681DA8"),
 }
 
