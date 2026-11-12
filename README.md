@@ -1,9 +1,5 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/vstack-logo-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="assets/vstack-logo-light.svg">
-    <img alt="vstack" src="assets/vstack-logo-light.svg" width="360">
-  </picture>
+  <img alt="vstack" src="assets/vstack-logo.svg" width="360">
 </p>
 
 <p align="center">
