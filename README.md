@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://haoailab.com/blogs/verifiable-llm-infra/"><b>Blog</b></a> ·
-  <a href="https://docs.google.com/spreadsheets/d/1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q/edit?gid=0#gid=0"><b>Verified Bug Tracker</b></a> ·
+  <a href="https://docs.google.com/spreadsheets/d/1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q/edit?gid=0#gid=0"><b>Verified AI Infra Bugs</b></a> ·
   <a href="https://github.com/hao-ai-lab/veriserve"><b>VeriServe</b></a> ·
   <a href="https://x.com/haoailab/status/2120595980659917024"><b>X</b></a>
 </p>
@@ -48,7 +48,7 @@ Run `/vstack-mode` on a target module and safety property:
 
 ## Case Studies
 
-- **Production Bug Hunting:** Confirmed concurrency, lifecycle, and numerical bugs uncovered in [SGLang](https://github.com/sgl-project/sglang) and [vLLM](https://github.com/vllm-project/vllm), with counterexamples and upstream PRs tracked in our [Verified Bug Tracker](https://docs.google.com/spreadsheets/d/1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q/edit?gid=0#gid=0).
+- **AI Infra Bug Hunting:** Human-verified concurrency, lifecycle, and numerical bugs uncovered across [SGLang](https://github.com/sgl-project/sglang) and [vLLM](https://github.com/vllm-project/vllm), with counterexamples and upstream PRs tracked in [Verified AI Infra Bugs](https://docs.google.com/spreadsheets/d/1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q/edit?gid=0#gid=0).
 - **[VeriServe](https://github.com/hao-ai-lab/veriserve):** A Prefill-Decode serving engine built with `vstack`, proved across 226 TLAPS modules with +0.18% average p50 TPOT overhead on NVIDIA GB200.
 
 ## Acknowledgments
