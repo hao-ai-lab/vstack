@@ -8,7 +8,7 @@
 | :--- | :--- | :--- |
 | **`Isolation`** | Safety (`□`) | Live requests never overwrite, read, or alias another request's KV/state slots. |
 | **`Conservation`** | Safety (`□`) | Slot allocations, reference counts, reserved indices, and clear hooks stay exact. |
-| **`Authority`** | Safety (`□`) | Ranks, control plane, and execution plane agree on active generation/memory state. |
+| **`Agreement`** | Safety (`□`) | Ranks, control plane, and execution plane agree on active generation/memory state. |
 | **`Progress`** | Liveness (`~>`) | Admissible requests eventually run without livelock, deadlock, or queue starvation. |
 | **`Finality`** | Liveness (`~>`) | Aborts, disconnects, and expired leases terminate and reclaim resources in bounded steps. |
 | **`Invariance`** | Equivalence (`≡`) | Output is invariant across batch composition (`M=1` vs `M>1`) and streaming chunking. |
@@ -19,6 +19,10 @@
 | :--- | :--- |
 | **`Unknown`** | Unreported upstream prior to the `vstack` formal scan. |
 | **`Known`** | Previously reported in an upstream Issue or unmerged PR (still present on `main` at scan time) and independently rediscovered by `vstack` model checking without reading GitHub reports. |
+
+## Found (`found_on`)
+
+UTC date when the finding was first recorded in our repository (the first model counterexample log or the date an earlier entry entered the bug ledger), rather than the upstream issue or PR date.
 
 ## How to Contribute a Verification or New Bug
 

@@ -25,7 +25,7 @@ SYSTEM_BG = {
 SPEC_STYLE = {
     "Isolation": ("#FCE8E6", "#A50E0E"),
     "Conservation": ("#FEF3C7", "#92400E"),
-    "Authority": ("#E0E7FF", "#3730A3"),
+    "Agreement": ("#E0E7FF", "#3730A3"),
     "Finality": ("#E8F0FE", "#1967D2"),
     "Progress": ("#E0F2FE", "#0369A1"),
     "Invariance": ("#F3E8FD", "#681DA8"),
@@ -55,7 +55,7 @@ STATUS_STYLE = {
     "On Hold": ("#F1F5F9", "#475569"),
 }
 
-COL_WIDTHS = [88, 148, 368, 112, 128, 104, 78, 126, 98, 114, 192]  # 11 cols, 1556px total
+COL_WIDTHS = [88, 148, 368, 112, 128, 104, 96, 78, 126, 98, 114, 192]  # 12 cols, 1652px total
 
 
 def hex_rgb(h: str) -> dict[str, float]:
@@ -140,6 +140,7 @@ def build_payload(csv_path: Path, sheet_id: int = 0, old_cond_rules_count: int =
         ("Violated Spec", "CENTER"),
         ("Impact", "CENTER"),
         ("Prior Status", "CENTER"),
+        ("Found", "CENTER"),
         ("Checker", "CENTER"),
         ("Human Verifier", "CENTER"),
         ("Upstream", "CENTER"),
@@ -184,6 +185,7 @@ def build_payload(csv_path: Path, sheet_id: int = 0, old_cond_rules_count: int =
                     str_cell(r["violated_spec"], bg=sp_bg, fg=sp_fg, bold=True, align="CENTER"),
                     str_cell(r["impact"], bg=imp_bg, fg=imp_fg, bold=True, align="CENTER"),
                     str_cell(prior_val, bg=pr_bg, fg=pr_fg, bold=True, align="CENTER"),
+                    str_cell((r.get("found_on") or "").strip(), bg="#FFFFFF", fg="#334155", bold=False, align="CENTER"),
                     str_cell(r["checker"], bg="#F1F5F9", fg="#1E293B", bold=True, align="CENTER", font="Roboto Mono", size=9),
                     verifier_cell(r["human_verifier"]),
                     up_cell,
@@ -323,10 +325,10 @@ def build_payload(csv_path: Path, sheet_id: int = 0, old_cond_rules_count: int =
         cond_rules.append((4, "TEXT_EQ", k, bg_c, fg_c))
     for k, (bg_c, fg_c) in PRIOR_STYLE.items():
         cond_rules.append((5, "TEXT_EQ", k, bg_c, fg_c))
-    cond_rules.append((7, "TEXT_STARTS_WITH", "@", "#CEEAD6", "#0D652D"))
-    cond_rules.append((7, "TEXT_EQ", "Unverified", "#F1F5F9", "#64748B"))
+    cond_rules.append((8, "TEXT_STARTS_WITH", "@", "#CEEAD6", "#0D652D"))
+    cond_rules.append((8, "TEXT_EQ", "Unverified", "#F1F5F9", "#64748B"))
     for k, (bg_c, fg_c) in STATUS_STYLE.items():
-        cond_rules.append((9, "TEXT_EQ", k, bg_c, fg_c))
+        cond_rules.append((10, "TEXT_EQ", k, bg_c, fg_c))
 
     for idx, (col_i, cond_type, val_str, bg_c, fg_c) in enumerate(cond_rules):
         requests.append(
