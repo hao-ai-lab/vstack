@@ -4,21 +4,21 @@
 
 ## Formal Specification Pillars (`violated_spec`)
 
-| Pillar | Property Forms | Meaning |
+| Pillar | Class | Meaning |
 | :--- | :--- | :--- |
-| **`Isolation`** | Safety (`□`) / 2-Run | Live requests never overwrite, read, or alias another request's KV or recurrent state slots. |
-| **`Integrity`** | Safety (`□`) | Consumers read only complete, generation-matched, and accurately accounted state and budgets. |
-| **`Finality`** | Safety (`□`) / Liveness (`~>`) | Cancellations, waits, and admin or admission steps stop or settle cleanly within bounded steps. |
-| **`Conservation`** | Safety (`□`) / Liveness (`~>`) | Slot allocations, row bounds, reference counts, and reserved indices stay exact and return once. |
-| **`Invariance`** | Hypersafety (`2-Run`) | Output and logprobs remain invariant across batch size, CUDA graph padding, and stream chunking. |
-| **`Consensus`** | Safety (`□`) | Distributed ranks and control planes agree on per-round decisions and collective call order. |
+| **`Isolation`** | Safety (`□`) | Live requests never overwrite, read, or alias another request's KV/state slots. |
+| **`Conservation`** | Safety (`□`) | Slot allocations, reference counts, reserved indices, and clear hooks stay exact. |
+| **`Authority`** | Safety (`□`) | Ranks, control plane, and execution plane agree on active generation/memory state. |
+| **`Progress`** | Liveness (`~>`) | Admissible requests eventually run without livelock, deadlock, or queue starvation. |
+| **`Finality`** | Liveness (`~>`) | Aborts, disconnects, and expired leases terminate and reclaim resources in bounded steps. |
+| **`Invariance`** | Equivalence (`≡`) | Output is invariant across batch composition (`M=1` vs `M>1`) and streaming chunking. |
 
 ## Prior Status (`prior_status`)
 
 | Value | Meaning |
 | :--- | :--- |
-| **`Unknown`** | Unreported upstream prior to our verification pass. |
-| **`Known`** | Tracked in an existing upstream Issue or unmerged PR on `main`, with a formal counterexample or new hardware reproduction contributed here. |
+| **`Unknown`** | Unreported upstream prior to the `vstack` formal scan. |
+| **`Known`** | Previously reported in an upstream Issue or unmerged PR (still present on `main` at scan time) and independently rediscovered by `vstack` model checking without reading GitHub reports. |
 
 ## How to Contribute a Verification or New Bug
 
