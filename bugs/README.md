@@ -13,6 +13,13 @@
 | **`Finality`** | Liveness (`~>`) | Aborts, disconnects, and expired leases terminate and reclaim resources in bounded steps. |
 | **`Invariance`** | Equivalence (`≡`) | Output is invariant across batch composition (`M=1` vs `M>1`) and streaming chunking. |
 
+## Prior Status (`prior_status`)
+
+| Value | Meaning |
+| :--- | :--- |
+| **`Unknown`** | Unreported upstream prior to the `vstack` formal scan. |
+| **`Known`** | Previously reported in an upstream Issue or unmerged PR (still present on `main` at scan time) and independently rediscovered by `vstack` model checking without reading GitHub reports. |
+
 ## How to Contribute a Verification or New Bug
 
 1. **Verify an `Unverified` candidate (`Needs Repro`):** Pick a row with `human_verifier = Unverified`, reproduce it on real hardware (or refute it by showing an outer guard in live `main`), and open a PR updating `human_verifier` to your `@github_handle` (plus `upstream_label` / `upstream_url` if you file an upstream Issue or fix PR).

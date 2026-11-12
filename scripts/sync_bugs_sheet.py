@@ -38,17 +38,24 @@ IMPACT_STYLE = {
     "Non-Determinism": ("#F3E8FD", "#681DA8"),
 }
 
+PRIOR_STYLE = {
+    "Unknown": ("#EEF2FF", "#3730A3"),
+    "Known": ("#F1F5F9", "#0F766E"),
+}
+
 STATUS_STYLE = {
     "Fixed": ("#CEEAD6", "#0D652D"),
     "Merged": ("#CEEAD6", "#0D652D"),
     "Confirmed": ("#FEF7E0", "#B06000"),
     "PR Open": ("#E8F0FE", "#1967D2"),
+    "Upstream Open": ("#E0F2FE", "#0369A1"),
     "Reported": ("#E8F0FE", "#1967D2"),
     "Needs Repro": ("#FEF7E0", "#B06000"),
+    "Needs Fix": ("#FEF7E0", "#B06000"),
     "On Hold": ("#F1F5F9", "#475569"),
 }
 
-COL_WIDTHS = [92, 152, 390, 118, 132, 82, 132, 98, 104, 196]  # 10 cols, 1496px total
+COL_WIDTHS = [88, 148, 368, 112, 128, 104, 78, 126, 98, 114, 192]  # 11 cols, 1556px total
 
 
 def hex_rgb(h: str) -> dict[str, float]:
@@ -119,20 +126,20 @@ def verifier_cell(raw: str) -> dict:
     val = raw.strip()
     if not val or val.lower() == "unverified":
         return str_cell("Unverified", bg="#F1F5F9", fg="#64748B", bold=True, align="CENTER")
-    # Single @handle links directly to GitHub profile
     if val.startswith("@") and "," not in val and " " not in val:
         handle = val[1:]
         return link_cell(f"https://github.com/{handle}", val, bg="#CEEAD6", fg="#0D652D")
     return str_cell(val, bg="#CEEAD6", fg="#0D652D", bold=True, align="CENTER")
 
 
-def build_payload(csv_path: Path, sheet_id: int = 0, old_cond_rules_count: int = 18) -> dict:
+def build_payload(csv_path: Path, sheet_id: int = 0, old_cond_rules_count: int = 29) -> dict:
     headers = [
         ("System", "LEFT"),
         ("Module", "LEFT"),
         ("Bug Summary", "LEFT"),
         ("Violated Spec", "CENTER"),
         ("Impact", "CENTER"),
+        ("Prior Status", "CENTER"),
         ("Checker", "CENTER"),
         ("Human Verifier", "CENTER"),
         ("Upstream", "CENTER"),
@@ -156,6 +163,8 @@ def build_payload(csv_path: Path, sheet_id: int = 0, old_cond_rules_count: int =
         sys_bg = SYSTEM_BG.get(r["system"], "#F8FAFC")
         sp_bg, sp_fg = SPEC_STYLE.get(r["violated_spec"], ("#F1F5F9", "#334155"))
         imp_bg, imp_fg = IMPACT_STYLE.get(r["impact"], ("#F1F5F9", "#334155"))
+        prior_val = (r.get("prior_status") or "Unknown").strip()
+        pr_bg, pr_fg = PRIOR_STYLE.get(prior_val, ("#F1F5F9", "#334155"))
         st_bg, st_fg = STATUS_STYLE.get(r["status"], ("#F1F5F9", "#475569"))
 
         up_url = (r.get("upstream_url") or "").strip()
@@ -174,6 +183,7 @@ def build_payload(csv_path: Path, sheet_id: int = 0, old_cond_rules_count: int =
                     str_cell(r["summary"], bg="#FFFFFF", fg="#0F172A", bold=False, align="LEFT", wrap="WRAP"),
                     str_cell(r["violated_spec"], bg=sp_bg, fg=sp_fg, bold=True, align="CENTER"),
                     str_cell(r["impact"], bg=imp_bg, fg=imp_fg, bold=True, align="CENTER"),
+                    str_cell(prior_val, bg=pr_bg, fg=pr_fg, bold=True, align="CENTER"),
                     str_cell(r["checker"], bg="#F1F5F9", fg="#1E293B", bold=True, align="CENTER", font="Roboto Mono", size=9),
                     verifier_cell(r["human_verifier"]),
                     up_cell,
@@ -311,10 +321,12 @@ def build_payload(csv_path: Path, sheet_id: int = 0, old_cond_rules_count: int =
         cond_rules.append((3, "TEXT_EQ", k, bg_c, fg_c))
     for k, (bg_c, fg_c) in IMPACT_STYLE.items():
         cond_rules.append((4, "TEXT_EQ", k, bg_c, fg_c))
-    cond_rules.append((6, "TEXT_STARTS_WITH", "@", "#CEEAD6", "#0D652D"))
-    cond_rules.append((6, "TEXT_EQ", "Unverified", "#F1F5F9", "#64748B"))
+    for k, (bg_c, fg_c) in PRIOR_STYLE.items():
+        cond_rules.append((5, "TEXT_EQ", k, bg_c, fg_c))
+    cond_rules.append((7, "TEXT_STARTS_WITH", "@", "#CEEAD6", "#0D652D"))
+    cond_rules.append((7, "TEXT_EQ", "Unverified", "#F1F5F9", "#64748B"))
     for k, (bg_c, fg_c) in STATUS_STYLE.items():
-        cond_rules.append((8, "TEXT_EQ", k, bg_c, fg_c))
+        cond_rules.append((9, "TEXT_EQ", k, bg_c, fg_c))
 
     for idx, (col_i, cond_type, val_str, bg_c, fg_c) in enumerate(cond_rules):
         requests.append(
@@ -350,7 +362,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--csv", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--old-rules", type=int, default=18)
+    parser.add_argument("--old-rules", type=int, default=29)
     args = parser.parse_args()
 
     payload = build_payload(args.csv, sheet_id=0, old_cond_rules_count=args.old_rules)
