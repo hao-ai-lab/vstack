@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 """Generate Google Sheets batchUpdate payload directly from canonical bugs/verified-bugs.csv.
 
+Renders one tab per target system in canonical order (default: SGLang at gid=0, vLLM at gid=100000001).
+Pass --sheet-info (output of `gsheets readonly info <SHEET_ID> --json`) to discover live sheetIds and
+existing conditionalFormatRule counts automatically so repeated syncs stay strictly idempotent.
+
 Usage:
-    python3 scripts/sync_bugs_sheet.py --csv bugs/verified-bugs.csv --out /tmp/vstack_sheet_batch.json
+    gsheets readonly info 1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q --json > /tmp/vstack_sheet_info.json
+    python3 scripts/sync_bugs_sheet.py --csv bugs/verified-bugs.csv --sheet-info /tmp/vstack_sheet_info.json --out /tmp/vstack_sheet_batch.json
     gsheets mutate raw-batch 1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q --file /tmp/vstack_sheet_batch.json
 """
 
@@ -22,8 +27,14 @@ SYSTEM_BG = {
     "Megatron-LM": "#DCFCE7",
 }
 
+DEFAULT_TAB_IDS = {
+    "SGLang": 0,
+    "vLLM": 100000001,
+}
+
 SPEC_STYLE = {
     "Isolation": ("#FCE8E6", "#A50E0E"),
+    "Integrity": ("#FFEDD5", "#9A3412"),
     "Conservation": ("#FEF3C7", "#92400E"),
     "Agreement": ("#E0E7FF", "#3730A3"),
     "Finality": ("#E8F0FE", "#1967D2"),
@@ -36,10 +47,13 @@ IMPACT_STYLE = {
     "Crash": ("#FEF7E0", "#B06000"),
     "Hang / Leak": ("#FEF7E0", "#B06000"),
     "Non-Determinism": ("#F3E8FD", "#681DA8"),
+    "API Error": ("#F1F5F9", "#475569"),
+    "Request Error": ("#FEF3C7", "#92400E"),
 }
 
 PRIOR_STYLE = {
     "Unknown": ("#EEF2FF", "#3730A3"),
+    "Partly Known": ("#FEF3C7", "#92400E"),
     "Known": ("#F1F5F9", "#0F766E"),
 }
 
@@ -52,6 +66,7 @@ STATUS_STYLE = {
     "Reported": ("#E8F0FE", "#1967D2"),
     "Needs Repro": ("#FEF7E0", "#B06000"),
     "Needs Fix": ("#FEF7E0", "#B06000"),
+    "Not Reported": ("#F1F5F9", "#475569"),
     "On Hold": ("#F1F5F9", "#475569"),
 }
 
@@ -124,15 +139,27 @@ def link_cell(
 
 def verifier_cell(raw: str) -> dict:
     val = raw.strip()
-    if not val or val.lower() == "unverified":
-        return str_cell("Unverified", bg="#F1F5F9", fg="#64748B", bold=True, align="CENTER")
+    if not val or val.lower() in ("in progress", "unverified"):
+        label = "In Progress" if val.lower() != "unverified" else "Unverified"
+        if not val:
+            label = "In Progress"
+        return str_cell(label, bg="#F1F5F9", fg="#64748B", bold=True, align="CENTER")
     if val.startswith("@") and "," not in val and " " not in val:
         handle = val[1:]
         return link_cell(f"https://github.com/{handle}", val, bg="#CEEAD6", fg="#0D652D")
     return str_cell(val, bg="#CEEAD6", fg="#0D652D", bold=True, align="CENTER")
 
 
-def build_payload(csv_path: Path, sheet_id: int = 0, old_cond_rules_count: int = 29) -> dict:
+def build_tab_requests(
+    rows: list[dict[str, str]],
+    *,
+    tab_title: str,
+    sheet_id: int,
+    tab_index: int,
+    old_cond_rules_count: int,
+    has_basic_filter: bool = True,
+    create_sheet: bool = False,
+) -> list[dict]:
     headers = [
         ("System", "LEFT"),
         ("Module", "LEFT"),
@@ -147,9 +174,6 @@ def build_payload(csv_path: Path, sheet_id: int = 0, old_cond_rules_count: int =
         ("Status", "CENTER"),
         ("Evidence", "LEFT"),
     ]
-
-    with csv_path.open(newline="", encoding="utf-8") as f:
-        rows = list(csv.DictReader(f))
 
     grid_rows = [
         {
@@ -196,21 +220,41 @@ def build_payload(csv_path: Path, sheet_id: int = 0, old_cond_rules_count: int =
         )
 
     total_data_rows = len(grid_rows)
-    total_grid_rows = max(35, total_data_rows + 15)
+    total_grid_rows = max(25, total_data_rows + 8)
     num_cols = len(headers)
 
     requests: list[dict] = []
-    for _ in range(old_cond_rules_count):
-        requests.append({"deleteConditionalFormatRule": {"sheetId": sheet_id, "index": 0}})
-    requests.append({"clearBasicFilter": {"sheetId": sheet_id}})
-
-    requests.extend(
-        [
+    if create_sheet:
+        requests.append(
+            {
+                "addSheet": {
+                    "properties": {
+                        "sheetId": sheet_id,
+                        "title": tab_title,
+                        "index": tab_index,
+                        "gridProperties": {
+                            "rowCount": total_grid_rows,
+                            "columnCount": num_cols,
+                            "frozenRowCount": 1,
+                            "frozenColumnCount": 1,
+                        },
+                        "tabColorStyle": {"rgbColor": hex_rgb("#1F5C8B")},
+                    }
+                }
+            }
+        )
+    else:
+        for _ in range(old_cond_rules_count):
+            requests.append({"deleteConditionalFormatRule": {"sheetId": sheet_id, "index": 0}})
+        if has_basic_filter:
+            requests.append({"clearBasicFilter": {"sheetId": sheet_id}})
+        requests.append(
             {
                 "updateSheetProperties": {
                     "properties": {
                         "sheetId": sheet_id,
-                        "title": "Verified Bugs",
+                        "title": tab_title,
+                        "index": tab_index,
                         "gridProperties": {
                             "rowCount": total_grid_rows,
                             "columnCount": num_cols,
@@ -219,9 +263,13 @@ def build_payload(csv_path: Path, sheet_id: int = 0, old_cond_rules_count: int =
                         },
                         "tabColorStyle": {"rgbColor": hex_rgb("#1F5C8B")},
                     },
-                    "fields": "title,gridProperties.rowCount,gridProperties.columnCount,gridProperties.frozenRowCount,gridProperties.frozenColumnCount,tabColorStyle",
+                    "fields": "title,index,gridProperties.rowCount,gridProperties.columnCount,gridProperties.frozenRowCount,gridProperties.frozenColumnCount,tabColorStyle",
                 }
-            },
+            }
+        )
+
+    requests.extend(
+        [
             {
                 "repeatCell": {
                     "range": {
@@ -326,6 +374,7 @@ def build_payload(csv_path: Path, sheet_id: int = 0, old_cond_rules_count: int =
     for k, (bg_c, fg_c) in PRIOR_STYLE.items():
         cond_rules.append((5, "TEXT_EQ", k, bg_c, fg_c))
     cond_rules.append((8, "TEXT_STARTS_WITH", "@", "#CEEAD6", "#0D652D"))
+    cond_rules.append((8, "TEXT_EQ", "In Progress", "#F1F5F9", "#64748B"))
     cond_rules.append((8, "TEXT_EQ", "Unverified", "#F1F5F9", "#64748B"))
     for k, (bg_c, fg_c) in STATUS_STYLE.items():
         cond_rules.append((10, "TEXT_EQ", k, bg_c, fg_c))
@@ -357,6 +406,70 @@ def build_payload(csv_path: Path, sheet_id: int = 0, old_cond_rules_count: int =
             }
         )
 
+    return requests
+
+
+def build_payload(
+    csv_path: Path,
+    *,
+    sheet_info_path: Path | None = None,
+    old_cond_rules_count: int = 29,
+) -> dict:
+    with csv_path.open(newline="", encoding="utf-8") as f:
+        all_rows = list(csv.DictReader(f))
+
+    ordered_systems: list[str] = []
+    for sys_name in list(SYSTEM_BG.keys()) + [r["system"] for r in all_rows]:
+        if sys_name not in ordered_systems and any(r["system"] == sys_name for r in all_rows):
+            ordered_systems.append(sys_name)
+
+    live_tabs: dict[str, tuple[int, int, bool]] = {}
+    used_sheet_ids: set[int] = set(DEFAULT_TAB_IDS.values())
+    if sheet_info_path is not None:
+        info = json.loads(sheet_info_path.read_text(encoding="utf-8"))
+        for s in info.get("sheets", []):
+            props = s.get("properties", {})
+            title = props.get("title", "")
+            sid = int(props.get("sheetId", 0))
+            cond_cnt = len(s.get("conditionalFormats", []))
+            has_bf = "basicFilter" in s
+            live_tabs[title] = (sid, cond_cnt, has_bf)
+            used_sheet_ids.add(sid)
+
+    next_auto_id = max(used_sheet_ids | {100000001}) + 1
+    requests: list[dict] = []
+    for tab_idx, sys_name in enumerate(ordered_systems):
+        sys_rows = [r for r in all_rows if r["system"] == sys_name]
+        if sys_name in live_tabs:
+            sid, cond_cnt, has_bf = live_tabs[sys_name]
+            create_sheet = False
+        elif sheet_info_path is None and sys_name in DEFAULT_TAB_IDS:
+            sid = DEFAULT_TAB_IDS[sys_name]
+            cond_cnt = old_cond_rules_count
+            has_bf = True
+            create_sheet = False
+        else:
+            sid = DEFAULT_TAB_IDS.get(sys_name, next_auto_id)
+            if sid in used_sheet_ids and sys_name not in DEFAULT_TAB_IDS:
+                sid = next_auto_id
+            next_auto_id = max(next_auto_id, sid + 1)
+            used_sheet_ids.add(sid)
+            cond_cnt = 0
+            has_bf = False
+            create_sheet = True
+
+        requests.extend(
+            build_tab_requests(
+                sys_rows,
+                tab_title=sys_name,
+                sheet_id=sid,
+                tab_index=tab_idx,
+                old_cond_rules_count=cond_cnt,
+                has_basic_filter=has_bf,
+                create_sheet=create_sheet,
+            )
+        )
+
     return {"requests": requests}
 
 
@@ -364,10 +477,15 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--csv", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--old-rules", type=int, default=29)
+    parser.add_argument("--sheet-info", type=Path, default=None, help="JSON from `gsheets readonly info <ID> --json`")
+    parser.add_argument("--old-rules", type=int, default=29, help="Fallback conditional rule count when --sheet-info is omitted")
     args = parser.parse_args()
 
-    payload = build_payload(args.csv, sheet_id=0, old_cond_rules_count=args.old_rules)
+    payload = build_payload(
+        args.csv,
+        sheet_info_path=args.sheet_info,
+        old_cond_rules_count=args.old_rules,
+    )
     args.out.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     print(f"Wrote {args.out} ({len(payload['requests'])} requests)")
 
