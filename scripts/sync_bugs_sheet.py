@@ -70,7 +70,7 @@ STATUS_STYLE = {
     "On Hold": ("#F1F5F9", "#475569"),
 }
 
-COL_WIDTHS = [88, 148, 368, 112, 128, 104, 96, 78, 126, 126, 98, 114, 192]  # 13 cols, 1778px total
+COL_WIDTHS = [88, 152, 392, 112, 128, 104, 96, 128, 102, 114, 280]  # 11 cols, 1696px total
 
 
 def hex_rgb(h: str) -> dict[str, float]:
@@ -168,8 +168,6 @@ def build_tab_requests(
         ("Impact", "CENTER"),
         ("Prior Status", "CENTER"),
         ("Found", "CENTER"),
-        ("Checker", "CENTER"),
-        ("Method", "CENTER"),
         ("Human Verifier", "CENTER"),
         ("Upstream", "CENTER"),
         ("Status", "CENTER"),
@@ -211,8 +209,6 @@ def build_tab_requests(
                     str_cell(r["impact"], bg=imp_bg, fg=imp_fg, bold=True, align="CENTER"),
                     str_cell(prior_val, bg=pr_bg, fg=pr_fg, bold=True, align="CENTER"),
                     str_cell((r.get("found_on") or "").strip(), bg="#FFFFFF", fg="#334155", bold=False, align="CENTER"),
-                    str_cell(r["checker"], bg="#F1F5F9", fg="#1E293B", bold=True, align="CENTER", font="Roboto Mono", size=9),
-                    str_cell((r.get("method") or "").strip(), bg="#F1F5F9", fg="#1E293B", bold=False, align="CENTER", font="Roboto Mono", size=9),
                     verifier_cell(r["human_verifier"]),
                     up_cell,
                     str_cell(r["status"], bg=st_bg, fg=st_fg, bold=True, align="CENTER"),
