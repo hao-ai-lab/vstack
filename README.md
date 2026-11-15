@@ -18,7 +18,7 @@
 ```bash
 git clone https://github.com/hao-ai-lab/vstack.git && cd vstack
 uv tool install -e .
-vstack setup   # checks Java/TLC/Z3 and installs skills into Claude Code, Codex, or Cursor
+vstack setup   # checks Java/TLC/Z3 and installs skills, agents and the docs they link to into Claude Code, Codex, or Cursor
 ```
 
 Or install directly as a plugin in Claude Code via `/plugin marketplace add hao-ai-lab/vstack` and `/plugin install vstack`, or in Cursor via `/add-plugin vstack`.
@@ -37,7 +37,10 @@ Run `/vstack-mode` on a target module and safety property:
 | **[Hash-pinned specs](docs/contracts.md)** | SHA-256 locks safety properties and theorem signatures so workers cannot weaken the goal. |
 | **[Line-anchored models](docs/method-selection.md)** | Every state variable and action maps to an exact `file:line@commit` across TLC, Apalache, and Z3. |
 | **[Mutation & trace gates](docs/gates.md)** | Models must fail on historical bugs, pass with the fix, fail when guards are removed, and [replay real traces](docs/trace-validation.md). |
+| **[Exposure gate](docs/exposure-gate.md)** | A finding is reported as caught by formal checking only if a faithful model with every bug switch off violates a named property, a red team fails to refute it, and it reproduces on a real engine next to a passing control. Shell models, experiment-only failures and calibration runs do not count. |
 | **Proof & runtime checks** | Critical state machines scale to unbounded TLAPS proofs with preconditions mirrored as runtime checks. |
+
+The **[model adequacy readout](docs/model-adequacy.md)** is not a gate: it reports how closely a model follows its code (trace acceptance, historical fix coverage and blind detection recall, each with its denominator and interval) and sets no thresholds. Bug hunts report a light version; full verification and regression skills report all of it.
 
 ## Recommended Models
 

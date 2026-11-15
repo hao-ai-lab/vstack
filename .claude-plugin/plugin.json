@@ -1,6 +1,6 @@
 {
   "name": "vstack",
-  "version": "0.1.0",
+  "version": "0.108.0",
   "description": "Formal verification workflows and mechanical anti-reward-hacking gates for coding agents.",
   "author": {
     "name": "Hao AI Lab"

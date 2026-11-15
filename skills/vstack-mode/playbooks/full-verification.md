@@ -16,4 +16,8 @@ Read [Layer 0: shared operating rules](../../../docs/layer-0.md). Use the follow
 
 If deductive proof is not justified, record the S7 selection and bounded guarantee; do not manufacture a proof requirement. S6 may only be skipped under the new-code/deductive-proof rule.
 
+Findings from S6 follow the [exposure gate](../../../docs/exposure-gate.md) per stage: Gates 1 and 3 at S6, Gate 2 at S5, Gate 4 by the coordinator. Only a finding that holds every gate applying to its method is listed as verified (`@github_handle`).
+
+Report all three parts of the [model adequacy readout](../../../docs/model-adequacy.md): S0 freezes `I_U` and seals the blind set, S3 keeps the anchor map, S4 reports readout 1 and coverage, S5 confirms mutants on real code.
+
 On an upstream defect, send a rollback ticket to that stage; never edit its frozen artifact from a downstream role. The coordinator independently reviews proof certificates under the proof gates and reruns model, trace and mutation checks.

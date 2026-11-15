@@ -2,7 +2,7 @@
 
 These adapted repository checks provide no solver, project model or end-to-end acceptance runner. Use the project's resource guard. The commands below define interfaces; they are not results from an installed project.
 
-Requirements: Bash with associative arrays and `mapfile`, GNU grep at `/usr/bin/grep`, GNU coreutils with `sha256sum` and `readlink -f`; awk, sed and diff; Python 3 and Git for the scope audit. Platform compatibility and solver integration have not been exercised for this package. See [acceptance limits](#legacy-tlc-label-parser).
+Requirements: Bash with associative arrays and `mapfile`, GNU grep at `/usr/bin/grep`, GNU coreutils with `sha256sum` and `readlink -f`; awk, sed and diff; Python 3 for the scope audit and the document check; Git for the scope audit. Platform compatibility and solver integration have not been exercised for this package. See [acceptance limits](#legacy-tlc-label-parser).
 
 ## Pin check
 
@@ -111,6 +111,24 @@ writable:
 ```
 
 Supply canonical project-relative POSIX paths. Globs follow Python `fnmatch`; `*` can span slashes. `--all` reads Git's tracked and untracked status and checks whether a declared role may own each changed path. It cannot identify the writer. Optional `VSTACK_MAIN_GLOBS` names a coordinator-owned file with one additional pattern per line; no file means no implicit coordinator grants. The audit neither resolves symlinks or traversal nor polices live writes. It does not replace a sandbox. The inherited Git rename and path parser requires canonical simple paths. Exit zero means only that the supplied paths or changed-path union match declared patterns.
+
+## Document check
+
+```sh
+python3 scripts/check_docs.py [--root DIR] [--links-only] [--expect-version X.Y.Z]
+vstack gate check-docs
+```
+
+Read-only. Exit zero means zero errors in these checks:
+
+| Check | Scope |
+|---|---|
+| Links | Every local link, image and `#anchor` in every `.md` file under the root resolves inside the root; anchors follow GitHub heading slugs or explicit HTML anchors. |
+| Ledger | `bugs/verified-bugs.csv` has the expected header and unique `VS-NNN` ids; `violated_spec` is one of the seven pillars; `method` is one of the [method classes](exposure-gate.md#method-classes); no row citing a listed shell model is `model_check`; a row with a named `human_verifier` states a real-engine run in `evidence`. |
+| Vocabularies | The pillar table in `bugs/README.md`, the sheet-sync styles and the method-class table list the same names as the check. |
+| Versions | The five version manifests carry one `MAJOR.MINOR.PATCH` version. |
+
+`--links-only` checks an installed tree such as `<base>/.claude`. The real-engine test is a keyword match on the evidence text and the shell-model list is kept by hand in the script; neither judges evidence.
 
 ## Mutation gate
 

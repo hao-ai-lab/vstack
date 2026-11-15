@@ -70,7 +70,7 @@ STATUS_STYLE = {
     "On Hold": ("#F1F5F9", "#475569"),
 }
 
-COL_WIDTHS = [88, 148, 368, 112, 128, 104, 96, 78, 126, 98, 114, 192]  # 12 cols, 1652px total
+COL_WIDTHS = [88, 148, 368, 112, 128, 104, 96, 78, 126, 126, 98, 114, 192]  # 13 cols, 1778px total
 
 
 def hex_rgb(h: str) -> dict[str, float]:
@@ -169,6 +169,7 @@ def build_tab_requests(
         ("Prior Status", "CENTER"),
         ("Found", "CENTER"),
         ("Checker", "CENTER"),
+        ("Method", "CENTER"),
         ("Human Verifier", "CENTER"),
         ("Upstream", "CENTER"),
         ("Status", "CENTER"),
@@ -211,6 +212,7 @@ def build_tab_requests(
                     str_cell(prior_val, bg=pr_bg, fg=pr_fg, bold=True, align="CENTER"),
                     str_cell((r.get("found_on") or "").strip(), bg="#FFFFFF", fg="#334155", bold=False, align="CENTER"),
                     str_cell(r["checker"], bg="#F1F5F9", fg="#1E293B", bold=True, align="CENTER", font="Roboto Mono", size=9),
+                    str_cell((r.get("method") or "").strip(), bg="#F1F5F9", fg="#1E293B", bold=False, align="CENTER", font="Roboto Mono", size=9),
                     verifier_cell(r["human_verifier"]),
                     up_cell,
                     str_cell(r["status"], bg=st_bg, fg=st_fg, bold=True, align="CENTER"),
@@ -373,11 +375,12 @@ def build_tab_requests(
         cond_rules.append((4, "TEXT_EQ", k, bg_c, fg_c))
     for k, (bg_c, fg_c) in PRIOR_STYLE.items():
         cond_rules.append((5, "TEXT_EQ", k, bg_c, fg_c))
-    cond_rules.append((8, "TEXT_STARTS_WITH", "@", "#CEEAD6", "#0D652D"))
-    cond_rules.append((8, "TEXT_EQ", "In Progress", "#F1F5F9", "#64748B"))
-    cond_rules.append((8, "TEXT_EQ", "Unverified", "#F1F5F9", "#64748B"))
+    col = {h_text: i for i, (h_text, _) in enumerate(headers)}
+    cond_rules.append((col["Human Verifier"], "TEXT_STARTS_WITH", "@", "#CEEAD6", "#0D652D"))
+    cond_rules.append((col["Human Verifier"], "TEXT_EQ", "In Progress", "#F1F5F9", "#64748B"))
+    cond_rules.append((col["Human Verifier"], "TEXT_EQ", "Unverified", "#F1F5F9", "#64748B"))
     for k, (bg_c, fg_c) in STATUS_STYLE.items():
-        cond_rules.append((10, "TEXT_EQ", k, bg_c, fg_c))
+        cond_rules.append((col["Status"], "TEXT_EQ", k, bg_c, fg_c))
 
     for idx, (col_i, cond_type, val_str, bg_c, fg_c) in enumerate(cond_rules):
         requests.append(

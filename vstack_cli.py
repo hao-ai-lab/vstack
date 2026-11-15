@@ -11,6 +11,22 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 
+# Skill, agent and doc cards refer to docs/, scripts/, templates/, examples/ and NOTICE.md by relative paths.
+# Installing these next to skills/ and agents/ in every target keeps those paths valid in a clone, a /plugin install
+# and `vstack setup` alike.
+LINKED_DIRS = ("docs", "scripts", "templates", "examples")
+LINKED_FILES = ("NOTICE.md", "LICENSE")
+IGNORE = shutil.ignore_patterns("__pycache__", "*.pyc")
+
+GATES = {
+    "check-pins": ROOT / "scripts" / "check_spec_pins.sh",
+    "assumptions": ROOT / "scripts" / "assumptions_check.sh",
+    "tlc-verdict": ROOT / "scripts" / "tlc_verdict.sh",
+    "op-mirror": ROOT / "scripts" / "op_mirror.sh",
+    "scope": ROOT / "scripts" / "scope_check.py",
+    "check-docs": ROOT / "scripts" / "check_docs.py",
+}
+
 
 def _check_cmd(label: str, cmd: list[str]) -> bool:
     exe = shutil.which(cmd[0])
@@ -44,13 +60,13 @@ def _copy_tree_contents(src: Path, dst: Path) -> int:
     dst.mkdir(parents=True, exist_ok=True)
     count = 0
     for item in sorted(src.iterdir()):
-        if item.name.startswith("."):
+        if item.name.startswith(".") or item.name == "__pycache__":
             continue
         target = dst / item.name
         if item.is_dir():
             if target.exists():
                 shutil.rmtree(target)
-            shutil.copytree(item, target)
+            shutil.copytree(item, target, ignore=IGNORE)
         else:
             shutil.copy2(item, target)
         count += 1
@@ -66,19 +82,26 @@ def cmd_setup(args: argparse.Namespace) -> int:
         return 1
 
     targets = [
-        ("Claude Code", base / ".claude" / "skills", base / ".claude" / "agents"),
-        ("Codex / Agents", base / ".agents" / "skills", None),
-        ("Cursor", base / ".cursor" / "skills", base / ".cursor" / "agents"),
+        ("Claude Code", base / ".claude"),
+        ("Codex / Agents", base / ".agents"),
+        ("Cursor", base / ".cursor"),
     ]
+    linked_dirs = [d for d in LINKED_DIRS if (ROOT / d).is_dir()]
+    linked_files = [f for f in LINKED_FILES if (ROOT / f).is_file()]
+    missing = [d for d in LINKED_DIRS if d not in linked_dirs] + [f for f in LINKED_FILES if f not in linked_files]
 
     print(f"Installing vstack from {ROOT} into {base}:")
-    for name, s_dst, a_dst in targets:
-        n_skills = _copy_tree_contents(skills_src, s_dst)
-        msg = f"  [installed] {name}: {n_skills} skills -> {s_dst}"
-        if a_dst is not None:
-            n_agents = _copy_tree_contents(agents_src, a_dst)
-            msg += f", {n_agents} agents -> {a_dst}"
-        print(msg)
+    if missing:
+        print(f"  [warn]    not found under {ROOT}; links to them will not resolve: {', '.join(missing)}")
+    for name, dotdir in targets:
+        n_skills = _copy_tree_contents(skills_src, dotdir / "skills")
+        n_agents = _copy_tree_contents(agents_src, dotdir / "agents")
+        for d in linked_dirs:
+            _copy_tree_contents(ROOT / d, dotdir / d)
+        for f in linked_files:
+            shutil.copy2(ROOT / f, dotdir / f)
+        linked = ", ".join(linked_dirs + linked_files)
+        print(f"  [installed] {name}: {n_skills} skills, {n_agents} agents, {linked} -> {dotdir}")
 
     print()
     cmd_doctor(args)
@@ -87,14 +110,7 @@ def cmd_setup(args: argparse.Namespace) -> int:
 
 
 def cmd_gate(args: argparse.Namespace) -> int:
-    scripts = {
-        "check-pins": ROOT / "scripts" / "check_spec_pins.sh",
-        "assumptions": ROOT / "scripts" / "assumptions_check.sh",
-        "tlc-verdict": ROOT / "scripts" / "tlc_verdict.sh",
-        "op-mirror": ROOT / "scripts" / "op_mirror.sh",
-        "scope": ROOT / "scripts" / "scope_check.py",
-    }
-    script = scripts[args.gate]
+    script = GATES[args.gate]
     cmd = ([sys.executable, str(script)] if script.suffix == ".py" else ["bash", str(script)]) + args.args
     return subprocess.call(cmd)
 
@@ -103,7 +119,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(prog="vstack", description="vstack formal verification CLI")
     sub = parser.add_subparsers(dest="command")
 
-    p_setup = sub.add_parser("setup", help="Check solvers and install skills/agents for Claude Code, Codex, and Cursor")
+    p_setup = sub.add_parser(
+        "setup", help="Check solvers and install skills, agents and the files they link to for Claude Code, Codex, and Cursor"
+    )
     p_setup.add_argument("--target", help="Workspace directory to install into (defaults to user home directory)")
     p_setup.set_defaults(func=cmd_setup)
 
@@ -111,7 +129,7 @@ def main() -> int:
     p_doc.set_defaults(func=cmd_doctor)
 
     p_gate = sub.add_parser("gate", help="Run a mechanical vstack verification gate script")
-    p_gate.add_argument("gate", choices=["check-pins", "assumptions", "tlc-verdict", "op-mirror", "scope"])
+    p_gate.add_argument("gate", choices=list(GATES))
     p_gate.add_argument("args", nargs=argparse.REMAINDER)
     p_gate.set_defaults(func=cmd_gate)
 

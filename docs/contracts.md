@@ -2,6 +2,18 @@
 
 One card per contract family. Describe observable consequences, not the implementation that happens to exist.
 
+## Three artifacts
+
+A system and its properties are both temporal formulas, and correctness is implication (Lamport, *Specifying Systems*, Addison-Wesley, 2002). Keep three artifacts apart:
+
+| Artifact | Frozen in | What it is | Place in a TLC configuration |
+|---|---|---|---|
+| Property clauses | S2 | Named state invariants, action invariants, liveness or relational formulas over observable state. SHA-256 pinned. | `INVARIANT` / `PROPERTY` |
+| Ideal reference model | S2 | An operational specification without implementation detail, for example `Ideal.tla`. In a refinement check `ImplSpec ⇒ IdealSpec` it plays the property role; [`op_mirror.sh`](gates.md#copied-operator-mirror) compares operators copied from it. Pinned with the clauses. | `PROPERTY` (its specification) |
+| Code-anchored model or descriptor | S3 | A transition system or computation descriptor built from `file:line@commit` at the pinned revision. | `SPECIFICATION` |
+
+The ideal model is a state machine but sits on the property side; only the code-anchored model describes the implementation. Classify every property clause by [pillar and formal class](method-selection.md#property-classes-and-the-seven-pillars) before choosing its checker.
+
 | Source | Required work |
 |---|---|
 | Top-level decomposition | Trace the contract to an approved system promise. Always required. |

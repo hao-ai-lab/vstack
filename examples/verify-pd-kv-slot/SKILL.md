@@ -38,3 +38,5 @@ Frozen trace and mutation jobs check their pinned model and traces. They can sta
 ## Result boundary
 
 Report in sync, updated, bug or blocked, with model, code and trace hashes and bounds. A blocked run never advances the aligned revision. A design-model proof is separate from evidence that the current implementation follows that model.
+
+A project adaptation also records the model's adequacy readout at the aligned revision, as the `verify-skill` template's adequacy section asks; this redacted example carries none.

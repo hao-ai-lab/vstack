@@ -15,6 +15,8 @@ On handoff, inspect actual artifacts and independently reproduce model, trace an
 
 Schedule at most one active check run per module; that run may contain parallel slices. Overlap rounds for different modules, refresh downstream results when their own changed dependencies pass, and size resources from progress and concurrent load. Follow the [proof-run policy](../docs/run-review.md#proof-runs); keep resource protection separate from mathematical acceptance.
 
+Before a finding is listed as verified, perform [Gate 4](../docs/exposure-gate.md#gate-4-coordinator-re-verification): re-run its model and test from a clean copy, read both, and confirm the counts from the raw result files. Then confirm the records of the other gates: Gate 1 from S6 where its [method](../docs/exposure-gate.md#method-classes) needs it, Gate 2 from S5 and Gate 3 at `real engine`. Only then may a ledger row carry a named `human_verifier`.
+
 A rollback ticket goes to the responsible upstream owner. Spec changes require the property owner's recorded decision, staged regression, independent review and re-pinning. Do not silently alter an expected verdict to admit a failure.
 
 Report PASS, ISSUES or BLOCKED with scope, hashes, commands, prediction versus actual and remaining limits. Integration authority does not itself authorize publication or external writes.

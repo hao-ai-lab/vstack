@@ -12,13 +12,22 @@ Read constants, state and action constraints, symmetry, view, properties and wor
 4. Were there errors, warnings, memory failures, timeouts or exploration caps?
 5. Is the result reproducible? For measurements used to choose between alternatives, alternate at least five runs per side and report the median and range.
 6. Does the range include the smallest known trigger?
-7. Were fault actions actually explored? Supply coverage and reachability witnesses.
+7. Were fault actions actually explored? Supply coverage and reachability witnesses. For liveness, name the fairness (on `Engine_*` actions only), the `EnvEventuallyQuiet` bound and each assumption about a neighbouring slice, with the deployment switches under which that neighbour's contract fails.
 
 Report **violation found**, **passed within stated bounds** or **INCONCLUSIVE**. Use **no measurable difference** only for measurements. Missing error or coverage evidence, zero required action coverage, unmatched comparison configurations or an unexplained bottleneck prevents acceptance. Unfinished work, unknown and timeout are never success.
 
 Read the final summary of generated and distinct states, not a progress line. Violation counts from multi-worker searches can vary with scheduling; do not silently require exact counts for those rows. The source rerun table distinguishes exact checks from informational state counts.
 
 A killed mutant must violate the expected property **and follow the expected mechanism**. Compare the historic switch combination to the actual pinned revision. A repair component outside the abstraction's reach is unverified, not proved unnecessary. Pair each positive run with its reachability witness under the same constants.
+
+### Environment restrictions and freedoms
+
+| Rule | Requirement |
+|---|---|
+| Asymmetric restrictions | A named environment timing restriction only removes behaviour. A safety violation found under it, or a liveness violation when fairness is on `Engine_*` actions only, is still a violation without it. Use restrictions in hunt and control configurations; never in a configuration reported as **passed within stated bounds**, a fix check, a [trace-acceptance](model-adequacy.md#readout-1-trace-and-baseline-agreement) run or a [blind-detection](model-adequacy.md#readout-3-blind-detection-recall) baseline. |
+| Pairwise freedom coverage | When opening every environment and fault freedom together exceeds the budget (for example a 60-minute wall), split configurations by fault tier so that every pair of freedoms is open together in at least one finished run. List the higher-order combinations that did not finish. Pairwise runs cannot see a defect that needs three freedoms or a specific event order; state that limit. |
+| Walls | A run stopped by a timeout, a state cap or a wall is **INCONCLUSIVE**, never passed. |
+| Assume-guarantee across slices | Circular discharge between neighbouring slices (A assumes B while B assumes A) is sound for safety only (Lamport, COMPOS 1997). Discharge liveness assumptions in an acyclic order. |
 
 ## Proof runs
 

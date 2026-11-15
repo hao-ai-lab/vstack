@@ -21,6 +21,8 @@ Workers read this document, their own stage skill and the inputs named in the ta
 
 Select stages for each property in S1. Require calibration and trace alignment in S4 and independent attacks in S5. S6 may be skipped only for newly written code whose property is headed for deductive proof. Proof is not required for every hardware-bounded problem; report the chosen tier and its limits.
 
+The [model adequacy readout](model-adequacy.md) is a report, not an exit check: its denominators and scoring are partly mechanical, the rest documented-only, and it has no pass threshold. The playbook selects its track. Findings follow the [exposure gate](exposure-gate.md), whose gates are exit checks of S5, S6 and the coordinator.
+
 ## One-way rollback tickets
 
 Report upstream defects through tickets; downstream workers cannot change frozen upstream outputs. Use `templates/rollback.md`: identify source and destination stages, artifact hashes, counterexample or trace evidence, proposed change and approver. After an accepted repair, re-enter the affected stage and rerun its downstream checks.

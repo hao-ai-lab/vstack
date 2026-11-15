@@ -22,6 +22,7 @@ A fixed source revision and existing anchors for deduplication.
 3. Record facts with `path:line@commit` and short source excerpts. Keep unsupported inferences explicitly unverified.
 4. Search the target and related systems by component. Record every examined candidate, rejection reason and search coverage. Confirm buggy triggers and fixed behavior on the stated revisions; a closed issue is not evidence that a fix merged.
 5. Test critical physical and synchronization assumptions on the real system before treating them as axioms, using authorized resources.
+6. For the full [adequacy readout](../../docs/model-adequacy.md#denominator-i_u), freeze each slice's historical-fix denominator `I_U` with its exclusion reason codes and SHA-256. The coordinator then draws the calibration set by a published seed and seals the blind set `H`, removing every trace of `H` from the maps handed downstream.
 
 ## 3. Exit checks
 

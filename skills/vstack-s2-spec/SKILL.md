@@ -17,11 +17,11 @@ The approved S1 design and obligation matrix.
 
 ## 2. Procedure
 
-1. Write a short, reviewable statement of observable consequences and explicit non-goals. Use [contract discovery](../../docs/contracts.md) and [the card template](../../templates/contract-card.md).
+1. Write a short, reviewable statement of observable consequences and explicit non-goals. Use [contract discovery](../../docs/contracts.md) and [the card template](../../templates/contract-card.md). Name each property clause's pillar and formal class from [property classes](../../docs/method-selection.md#property-classes-and-the-seven-pillars); the class decides the checker and whether fairness is needed.
 2. Require top-level decomposition plus historical bugs or consumer requirements; complete one-step induction for ledger and protocol families. Scan all seven consumer-precondition categories.
 3. Calibrate negative examples, legal edge behavior, witnesses and minimum scale before freezing. S4 repeats calibration on the complete model.
 4. Expose environment assumptions and ambiguous semantics as sourced switches. State which interpretation each claim requires.
-5. Have the coordinator pin the approved text, ideal model and check configurations. Before deductive proof, also freeze the complete inductive invariant and root statement, including explicit parameter ranges and configuration premises. Check content hashes before every counted run.
+5. Have the coordinator pin the approved text, ideal model and check configurations: S2 freezes the property clauses and the ideal reference model of the [three artifacts](../../docs/contracts.md#three-artifacts); S3 builds the code-anchored model against them. Before deductive proof, also freeze the complete inductive invariant and root statement, including explicit parameter ranges and configuration premises. Check content hashes before every counted run.
 
 ## 3. Exit checks
 

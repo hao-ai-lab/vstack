@@ -14,4 +14,8 @@ Read [Layer 0: shared operating rules](../../../docs/layer-0.md). Use the follow
 
 Stop at the S6 deliverable: classified, reproducible findings and validated repairs. S7 (upgrade to a proof)/S8 (package and maintain regression) are subsequent work, not implicitly completed.
 
+The [exposure gate](../../../docs/exposure-gate.md) is checked per stage: Gates 1 and 3 at S6, Gate 2 at S5, Gate 4 by the coordinator. Only a finding that holds every gate applying to its method is listed as verified (`@github_handle`).
+
+This playbook takes the hunt track of the [model adequacy readout](../../../docs/model-adequacy.md#tracks): `InputEnabled_<E>` invariants and `W_*` witnesses are required; `TAR` may be `N/A (no trace harness)`; no historical denominator or blind matrix.
+
 On an upstream defect, send a rollback ticket to that stage; never edit its frozen artifact from a downstream role. The coordinator reruns accepted outputs independently.

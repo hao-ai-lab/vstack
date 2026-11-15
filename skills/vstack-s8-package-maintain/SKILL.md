@@ -17,7 +17,7 @@ The accepted artifacts from S4, S5, S6 and S7, as required by the S1 route: mode
 
 ## 2. Procedure
 
-1. Fill [verify-skill](../../templates/verify-skill.md): coverage, synchronized revision, assumptions, bounds, one command, expected results and triage rules.
+1. Fill [verify-skill](../../templates/verify-skill.md): coverage, synchronized revision, assumptions, bounds, one command, expected results, triage rules and the full [adequacy readout](../../docs/model-adequacy.md) of the model at that revision.
 2. Run five checks in order: pins, drift, model, trace regression, then mutation regression. Keep the regression small and repeatable; measure and report its duration.
 3. Break protected logic in a source copy: the check must turn red. Restore it: green with the baseline. Record prediction versus actual, including failed predictions.
 4. After upstream changes, run unchanged first. Inspect all changes to covered state, including moved or new writers. Classify each as no effect, model drift, intentional promise change or possible code bug.

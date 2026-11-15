@@ -17,9 +17,9 @@ Models, configurations, source anchors and witnesses from S3.
 
 ## 2. Procedure
 
-1. Timestamp predictions. Run four calibration checks: the historical bug violates the expected property by the expected mechanism; the fix completes within bounds; removing each repair component causes a violation; reachability witnesses are reached and their negations fail.
+1. Timestamp predictions. Run four calibration checks: the historical bug violates the expected property by the expected mechanism; the fix completes within bounds; removing each repair component causes a violation; reachability witnesses are reached and their negations fail. Aggregated over the frozen denominator `I_U`, these results give the numerators `Cov_expr` and `Cov_emergent` of the [adequacy readout](../../docs/model-adequacy.md#numerators).
 2. Repeat two-sided contract calibration at the minimum scale and one increment above it. A component outside the abstraction is unverified, not a pass.
-3. Apply [trace-conformance checklist](../../docs/trace-validation.md) to real traces. Keep observation, instrumentation, completion and safety evidence separate.
+3. Apply [trace-conformance checklist](../../docs/trace-validation.md) to real traces. Keep observation, instrumentation, completion and safety evidence separate. Report [readout 1](../../docs/model-adequacy.md#readout-1-trace-and-baseline-agreement): `TAR` with its negative-mutant rejection rate, or `TAR = N/A (no trace harness)`, and clean-baseline counterexamples as `Confirmed Bug`, `Model Defect` and `Unjudged (pending repro)` counts.
 4. Classify every NOT_CONSUMED at the first divergence; never edit a trace to make it count as accepted.
 5. Review every run with [the seven questions](../../docs/run-review.md).
 

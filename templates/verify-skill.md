@@ -27,6 +27,17 @@ Use the project resource guard. Missing inputs, timeout, unknown and incomplete 
 - Mutation: both model and code edits must be detected; restore and require the baseline again.
 - Counterexample triage: replay using the actual code; distinguish property, model, instrumentation and code failures.
 
+## Adequacy readout
+
+Record the model's readout at the aligned revision (vstack `docs/model-adequacy.md`), with model hash and date. Report numbers with denominators and intervals; set no thresholds.
+
+| Readout | Value |
+|---|---|
+| `TAR` (or `N/A (no trace harness)`) and negative-mutant rejection rate | <...> |
+| Clean-baseline counterexamples: `Confirmed Bug` / `Model Defect` / `Unjudged (pending repro)` | <...> |
+| `I_U` hash; `Cov_expr(U)`, `Cov_emergent(U)` and residual classes | <...> |
+| `BDR_revert`, `BDR_mutant` with Clopper–Pearson 95% intervals | <...> |
+
 ## Read and maintain
 
 A baseline matching its known violations does not mean the implementation is repaired. State a separate required-fix contract when relevant.

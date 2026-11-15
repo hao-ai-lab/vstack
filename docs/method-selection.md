@@ -11,6 +11,25 @@ Use two independent axes: the mathematical difficulty determines the representat
 
 Record each obligation's difficulty, bounds, code ownership, change rate and failure severity. Map the obligation to ledger, protocol, computation, alignment and fallback guarantees. State the weakest link in every public claim.
 
+## Property classes and the seven pillars
+
+The bug ledger names each violated property by one of seven pillars. Route each by its formal class.
+
+**Single-trace properties.** Every trace property is the intersection of a safety property and a liveness property (Alpern and Schneider, *Information Processing Letters* 21(4):181–185, 1985). A safety violation shows on a finite prefix; no finite prefix violates a liveness property. Check the two parts separately.
+
+**Relational properties.** A property that compares two executions is a hyperproperty and in general not a trace property (Clarkson and Schneider, *Journal of Computer Security*, 2010).
+
+| Pillar | Formal class | Form | Preferred route |
+|---|---|---|---|
+| `Isolation`, `Integrity`, `Conservation`, `Agreement` | State or action safety | `□I`, `□[A]_v` | TLC; Apalache for larger symbolic domains; TLAPS for unbounded claims |
+| `Finality` | Bounded-response safety | `□(Pending ⇒ steps ≤ N)` over a step or lease counter | TLC invariant over the counter; no fairness assumption |
+| `Progress` | Liveness | `◇P`, `P ~> Q` | TLC liveness with explicit fairness on engine actions only (S3 [open environment](../skills/vstack-s3-model/SKILL.md#open-environment)) |
+| `Invariance` | 2-safety hyperproperty or relational equivalence (`≡`) | Same output over two executions or two code paths | Exhaustive property sweep or differential test on the real functions; Z3 over dispatch descriptors; TLA+ self-composition only when concurrent interleavings matter |
+
+As the ledger states it ("in bounded steps"), `Finality` is bounded response: the bad thing, the bound passing without termination, is visible on a finite prefix, so it is safety and needs no fairness. An unbounded "eventually reclaims" property is liveness; route it like `Progress`.
+
+`Invariance` covers two shapes. Batch invariance (one request alone and with batch partners) is a 2-safety hyperproperty: a violation needs two executions (Terauchi and Aiken, SAS 2005), and self-composition reduces it to safety of the composed system (Barthe, D'Argenio and Rezk, CSFW 2004). Equivalence of two code paths or configurations (streaming vs. non-streaming, CUDA graph on vs. off) is a relational property between two programs, checked on a product program (Barthe, Crespo and Kunz, FM 2011); it becomes a hyperproperty only when the configuration is an input of one system. Either way, prefer real-code sweeps and descriptors first.
+
 ## State-machine tiers
 
 1. **Explicit state checking:** TLC explores configured finite domains and gives counterexamples. Appropriate for evolving code and small hardware-fixed participant counts; include deadlock, liveness and alternative hardware readings where relevant.

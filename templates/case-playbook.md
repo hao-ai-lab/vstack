@@ -7,6 +7,7 @@
 - State, actors, faults, domains and known calibration bugs: <...>.
 - Assurance tier and why it fits consequences/scale/ownership: <...>.
 - Stage route and any allowed omissions: <...>.
+- Adequacy track (hunt or full; vstack `docs/model-adequacy.md`) and the readouts owed: `TAR` or `N/A`, `I_U`, `Cov_expr` / `Cov_emergent`, `BDR_revert` / `BDR_mutant`: <...>.
 - Owner, assigned writable paths, inputs/hashes, budget and stop conditions: <...>.
 - Strongest original evidence; what an expert would check beyond this brief: <...>.
 - Independent evidence beyond author self-report: <...>.
@@ -23,6 +24,7 @@ Resolve the riskiest unknown first. Establish the buggy baseline, then split int
 - Expected / actual / explanation for any mismatch: <...>.
 - Evidence paths; state/action coverage; completion status: <...>.
 - VERIFIED / NOT VERIFIED / INCONCLUSIVE: <...>.
+- Per finding (vstack `docs/exposure-gate.md`): method class, Gate 1a / 1b, `found_by`, Gate 3 level: <...>.
 
 After repeated failures sharing a premise, test that premise. A gate defect is a separate repair, not a reason to bypass it. Write the decision trail as work proceeds.
 
