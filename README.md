@@ -55,6 +55,16 @@ The **[model adequacy readout](docs/model-adequacy.md)** is not a gate: it repor
 - **Community Verification:** Reproduce an `In Progress` candidate on hardware, validate an open fix PR, or contribute a new formally caught infra bug via PR to [`bugs/`](bugs/README.md) to be credited under **`Human Verifier`**.
 - **[VeriServe](https://github.com/hao-ai-lab/veriserve):** A Prefill-Decode serving engine built with `vstack`, proved across 226 TLAPS modules with +0.18% average p50 TPOT overhead on NVIDIA GB200.
 
+## Contributors
+
+<p>
+  <a href="https://github.com/yuxuandexter"><img src="assets/contributors/yuxuandexter.png" width="56" alt="Yuxuan Zhang" title="Yuxuan Zhang (@yuxuandexter)"></a>&nbsp;
+  <a href="https://github.com/alexzms"><img src="assets/contributors/alexzms.png" width="56" alt="Minshen Zhang" title="Minshen Zhang (@alexzms)"></a>&nbsp;
+  <a href="https://github.com/Davids048"><img src="assets/contributors/Davids048.png" width="56" alt="Junda Su" title="Junda Su (@Davids048)"></a>&nbsp;
+  <a href="https://github.com/Boreas618"><img src="assets/contributors/Boreas618.png" width="56" alt="Yi Sun" title="Yi Sun (@Boreas618)"></a>&nbsp;
+  <a href="https://github.com/GindaChen"><img src="assets/contributors/GindaChen.png" width="56" alt="Junda Chen" title="Junda Chen (@GindaChen)"></a>
+</p>
+
 ## Acknowledgments
 
 Skill orchestration draws inspiration from Lauren Tan's [pstack](https://github.com/cursor/plugins/tree/main/pstack). Trace validation and proof gates build on lessons from [Specula](https://github.com/specula-org/Specula), [SysMoBench](https://github.com/specula-org/SysMoBench), and [TLAPS-Bench](https://github.com/specula-org/TLAPS-Bench). We thank the TLA+, Z3, SGLang, and vLLM communities.
