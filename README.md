@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://haoailab.com/blogs/verifiable-llm-infra/"><b>Blog</b></a> ·
-  <a href="https://docs.google.com/spreadsheets/d/1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q/edit?gid=0#gid=0"><b>Verified AI Infra Bugs</b></a> ·
+  <a href="https://docs.google.com/spreadsheets/d/1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q/edit"><b>Verified AI Infra Bugs</b></a> ·
   <a href="https://github.com/hao-ai-lab/veriserve"><b>VeriServe</b></a> ·
   <a href="https://x.com/haoailab/status/2120595980659917024"><b>X</b></a>
 </p>
@@ -12,6 +12,11 @@
 `vstack` is a formal verification toolkit for coding agents. Naive agents routinely game formal checkers by weakening invariants, dropping timeout branches, or adding unverified assumptions; `vstack` enforces mechanical gates across TLA+, Apalache, TLAPS, and Z3 so agents find real bugs and prove critical state machines without cheating.
 
 ![vstack workflow](assets/vstack-anti-cheat.gif)
+
+## News
+
+- **[2026-11-13]** Shared 5 [vLLM](https://github.com/vllm-project/vllm) bug case studies on [X](https://x.com/haoailab/status/2121320482876399825), with 15+ bugs tracked and growing in our [bug tracker](https://docs.google.com/spreadsheets/d/1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q/edit).
+- **[2026-11-11]** Released `vstack` along with our [blog post](https://haoailab.com/blogs/verifiable-llm-infra/), [VeriServe](https://github.com/hao-ai-lab/veriserve), and [launch X thread](https://x.com/haoailab/status/2120595980659917024).
 
 ## Quick Start
 
@@ -51,7 +56,7 @@ The **[model adequacy readout](docs/model-adequacy.md)** is not a gate: it repor
 
 ## Case Studies
 
-- **AI Infra Bug Hunting:** Concurrency, lifecycle, and numerical bugs uncovered across [SGLang](https://github.com/sgl-project/sglang) and [vLLM](https://github.com/vllm-project/vllm), tracked in [Verified AI Infra Bugs](https://docs.google.com/spreadsheets/d/1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q/edit?gid=0#gid=0) and synced from [`bugs/verified-bugs.csv`](bugs/verified-bugs.csv) with `Prior Status` separating net-new (`Unknown`) discoveries from partly tracked (`Partly Known`) and independently caught unfixed upstream bugs (`Known`).
+- **AI Infra Bug Hunting:** Concurrency, lifecycle, and numerical bugs uncovered across [vLLM](https://github.com/vllm-project/vllm) and [SGLang](https://github.com/sgl-project/sglang), tracked in [Verified AI Infra Bugs](https://docs.google.com/spreadsheets/d/1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q/edit) and synced from [`bugs/verified-bugs.csv`](bugs/verified-bugs.csv) with `Prior Status` separating net-new (`Unknown`) discoveries from partly tracked (`Partly Known`) and independently caught unfixed upstream bugs (`Known`).
 - **Community Verification:** Reproduce an `In Progress` candidate on hardware, validate an open fix PR, or contribute a new formally caught infra bug via PR to [`bugs/`](bugs/README.md) to be credited under **`Human Verifier`**.
 - **[VeriServe](https://github.com/hao-ai-lab/veriserve):** A Prefill-Decode serving engine built with `vstack`, proved across 226 TLAPS modules with +0.18% average p50 TPOT overhead on NVIDIA GB200.
 

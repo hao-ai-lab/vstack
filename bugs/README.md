@@ -1,6 +1,6 @@
 # Verified AI Infra Bugs (`vstack`)
 
-[`verified-bugs.csv`](verified-bugs.csv) is the canonical source for the live [Verified AI Infra Bugs](https://docs.google.com/spreadsheets/d/1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q/edit?gid=0#gid=0) tracker. Merged pull requests to `verified-bugs.csv` are synced one-way into per-system tabs (`SGLang`, `vLLM`) on the read-only Google Sheet via [`scripts/sync_bugs_sheet.py`](../scripts/sync_bugs_sheet.py).
+[`verified-bugs.csv`](verified-bugs.csv) is the canonical source for the live [Verified AI Infra Bugs](https://docs.google.com/spreadsheets/d/1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q/edit) tracker. Merged pull requests to `verified-bugs.csv` are synced one-way into an `Overview` landing tab and per-system tabs (`vLLM`, `SGLang`) on the read-only Google Sheet via [`scripts/sync_bugs_sheet.py`](../scripts/sync_bugs_sheet.py).
 
 The ledger records real defects that `vstack` workflows caught in AI infra code. `method` says how a row was found; `human_verifier` says whether it is verified. Only a row with `method = model_check` that passes [Gate 1a and Gate 1b](../docs/exposure-gate.md#gate-1-formal-exposure) may be described as "caught by model checking". [`scripts/check_docs.py`](../scripts/check_docs.py) checks the column values below.
 
