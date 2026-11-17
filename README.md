@@ -15,6 +15,7 @@
 
 ## News
 
+- **[2026-11-17]** Shared 5 [SGLang](https://github.com/sgl-project/sglang) bug case studies and fix PRs on [X](https://x.com/haoailab/status/2122758544462434802), with 40+ bugs now tracked across SGLang and vLLM in our [bug tracker](https://docs.google.com/spreadsheets/d/1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q/edit).
 - **[2026-11-13]** Shared 5 [vLLM](https://github.com/vllm-project/vllm) bug case studies on [X](https://x.com/haoailab/status/2121320482876399825), with 15+ bugs tracked and growing in our [bug tracker](https://docs.google.com/spreadsheets/d/1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q/edit).
 - **[2026-11-11]** Released `vstack` along with our [blog post](https://haoailab.com/blogs/verifiable-llm-infra/), [VeriServe](https://github.com/hao-ai-lab/veriserve), and [launch X thread](https://x.com/haoailab/status/2120595980659917024).
 
@@ -56,7 +57,7 @@ The **[model adequacy readout](docs/model-adequacy.md)** is not a gate: it repor
 
 ## Case Studies
 
-- **AI Infra Bug Hunting:** Concurrency, lifecycle, and numerical bugs uncovered across [vLLM](https://github.com/vllm-project/vllm) and [SGLang](https://github.com/sgl-project/sglang), tracked in [Verified AI Infra Bugs](https://docs.google.com/spreadsheets/d/1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q/edit) and synced from [`bugs/verified-bugs.csv`](bugs/verified-bugs.csv) with `Prior Status` separating net-new (`Unknown`) discoveries from partly tracked (`Partly Known`) and independently caught unfixed upstream bugs (`Known`).
+- **AI Infra Bug Hunting:** Concurrency, lifecycle, and numerical bugs uncovered across [SGLang](https://github.com/sgl-project/sglang) ([X case studies](https://x.com/haoailab/status/2122758544462434802)) and [vLLM](https://github.com/vllm-project/vllm) ([X case studies](https://x.com/haoailab/status/2121320482876399825)), tracked in [Verified AI Infra Bugs](https://docs.google.com/spreadsheets/d/1FL5QqgzEpja9k8Zw6GmIQDtHveddjj1coHe1MJ3Ts-Q/edit) and synced from [`bugs/verified-bugs.csv`](bugs/verified-bugs.csv) with `Prior Status` separating net-new (`Unknown`) discoveries from partly tracked (`Partly Known`) and independently caught unfixed upstream bugs (`Known`).
 - **Community Verification:** Reproduce an `In Progress` candidate on hardware, validate an open fix PR, or contribute a new formally caught infra bug via PR to [`bugs/`](bugs/README.md) to be credited under **`Human Verifier`**.
 - **[VeriServe](https://github.com/hao-ai-lab/veriserve):** A Prefill-Decode serving engine built with `vstack`, proved across 226 TLAPS modules with +0.18% average p50 TPOT overhead on NVIDIA GB200.
 
