@@ -20,6 +20,14 @@ Record each task's property, source revision, tier, input hashes, writable paths
 
 Assign work to [vstack-worker](../../agents/vstack-worker.md), independent review to [vstack-redteam](../../agents/vstack-redteam.md), and keep authority with [vstack-main](../../agents/vstack-main.md). Delegate only with available host tools and user authorization. Role documents provide neither scheduling nor sandboxing.
 
+**Coordinating units.** Every route runs its units through the [coordination loop](playbooks/coordinate.md). The coordinator generates each unit's [task brief](../../templates/task-brief.md) from a fields file with `scripts/make_brief.py`, never from another brief, and sends it only after `scripts/check_brief.py` passes, checks every reply's hand-back block with `scripts/parse_handback.py`, and keeps the [unit table](../../templates/unit-table.tsv) as the coverage matrix, checked against the plan by `scripts/check_unit_table.py`. It writes briefs, accepts and merges rows; it does not census, model or write specifications itself. Each unit gets one fresh worker with its own output directory and row copy; workers never share a writable file or see each other's directories. Drain every row to `accepted` or `blocked`, re-spawning a unit once before recording a gap. A row is complete only with evidence paths in its output directory.
+
+**One unit first.** Send one unit of each batch through brief, work, hand-back and acceptance before fanning out the rest, so that a flaw in the brief costs one worker instead of the batch. The unit table marks that unit in `first_of_batch`; its check fails when another unit of the batch leaves `queued` before the first is `accepted`.
+
+**Key units are written twice.** For a unit marked `key`, two workers write it independently from the same brief and frozen inputs, in separate directories. Compare the writings row by row (writer lists, guards, candidate findings) in a [writing-compare table](../../templates/writing-compare.tsv) checked by `scripts/check_writings.py`, pick a base and graft the other's extra rows before either writing is used.
+
+**An error seen twice becomes a check or a template field.** At the end of each batch, read its hand-backs and lessons. An error class seen twice gets a failing check or a required template field in the same round, registered in the [rule registry](../../docs/rule-registry.md); text alone is not a fix ([Layer 0](../../docs/layer-0.md)).
+
 At a failed upstream assumption, issue a [rollback ticket](../../templates/rollback.md), preserving frozen artifacts. A property change needs the property owner's explicit decision and coordinator re-pinning. Deliver PASS, ISSUES or BLOCKED with evidence; incomplete or unknown checks never count as PASS.
 
 The [gate interface guide](../../docs/gates.md) describes actual scripts and their limits. Read it before configuring a project runner; the package does not include a generic solver harness.

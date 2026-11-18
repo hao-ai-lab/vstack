@@ -11,6 +11,14 @@ Use two independent axes: the mathematical difficulty determines the representat
 
 Record each obligation's difficulty, bounds, code ownership, change rate and failure severity. Map the obligation to ledger, protocol, computation, alignment and fallback guarantees. State the weakest link in every public claim.
 
+## Units, planes and edges
+
+Label subsystem responsibilities `control` when they decide who may touch what and when (ownership, order and lifecycle), `data` when they compute or move data given legal handles and parameters, or `both` with the slice of each stated. Many subsystems are `both`: these labels slice responsibilities; they are not a verified partition of the system.
+
+A `state` edge has both sides read or write the same mutable resource, or lets one side's guard read the other's state; check the sides together. A `parameter` edge carries only a value, and the receiver's property holds for every value in a stated range, so it permits a cut. An edge that is both is a state edge. Record the criterion for each classification. A parameter cut depends on that value range actually holding; liveness also needs conditions on progress and fairness, and two-run properties need conditions relating the values and behavior across both runs.
+
+A unit is one shared mutable resource together with the subsystems that write or hold it, read from a row group in the [resource matrix](../templates/resource-matrix.tsv). The resource matrix is the main table of the census: units are derived from its resources, never enumerated as combinations of subsystems. Count distinct participating subsystems as `k` and record the unit in the [unit table](../templates/unit-table.tsv). [S0](../skills/vstack-s0-decompose/SKILL.md#2-procedure) settles the census and edges; [S1](../skills/vstack-s1-select/SKILL.md#2-procedure) sizes and orders units and routes each property by plane and formal class using the table below.
+
 ## Property classes and the seven pillars
 
 The bug ledger names each violated property by one of seven pillars. Route each by its formal class.

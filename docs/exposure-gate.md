@@ -62,11 +62,23 @@ Gates 2, 3 and 4 apply to every method.
 An independent pass tried to refute the finding and failed: no outer guard makes it unreachable, it is not documented
 as intended, and the trace does not rely on a freedom the real system does not have.
 
+A refutation is a claim too. One that rests only on reading code (an outer guard, a defensive copy, a check in
+another function) is a lead until a run of the trigger shows that the cited guard stops it on this path; until then
+the finding stays open. A reading that the finding stands is likewise a lead, settled by [Gate 3](#gate-3-real-engine).
+Independent readings of the same code can both be wrong, so re-judge a sample of refuted leads with known bugs of the
+same code mixed in: a known bug judged refuted shows that the refutation method misses. Search for a guard, a copy or a
+writer by the bare function or field name (`replace(`, `.slots =`), not only by its qualified form
+(`module.replace(`); calls through an alias, an instance method or a re-export are otherwise missed.
+
 ## Gate 3: real engine
 
 The failure is reproduced on a real engine, in the same run as a control that behaves correctly. The evidence states
-the level reached, counts with their unit (runs, requests, positions), the control, every non-default flag or injected
-delay, the model served and the commit.
+the level reached, counts with their unit (runs, requests, positions) and kind (random, directed, selected), the
+control, every non-default flag or injected delay, the model served and the commit. Put the level, entry point,
+default and actual launch commands, non-default settings, preconditions, injection details, counts with their unit
+and kind and control arms in the
+[finding record fields](../templates/finding-record.tsv); prose alone no longer suffices for those facts.
+Keep the served model and run commit in the supporting evidence.
 
 Levels are kept apart and never rounded up: `model only`, `CPU replay of real code`, `real engine`. The gate holds only
 at `real engine`. A named `human_verifier` requires a real-engine record.
@@ -96,6 +108,15 @@ the same real traces.
   interleaving. Both can pass Gate 1. Reports say which one it was; "the checker predicted it" is reserved for
   `checker`.
 - The method class, the Gate 1a and 1b results and the Gate 3 level of each finding.
+- The [finding record](../templates/finding-record.tsv) fields: entry point and kind; default and actual launch
+  commands; computed non-default settings; preconditions; injection and model restriction; hits, runs, unit and
+  kind; stock, patched and reference arms and reference kind; consequence and impact; duplicate search and checked
+  upstream commit; verdict and independent reviewer; ambiguous facts; computed tier, grade and route. A fact not
+  established is `unknown`, never a placeholder. See [danger grading](danger-grading.md).
+- A finding that lets one request read or change another request's data, or that ends the service for more than the
+  request itself (a process exit, refused new requests, failed in-flight requests), carries the `cross_request_data:`
+  or `availability:` marker in `impact`. Its reportable route is then the private security channel, which comes before
+  any public text. See [private routing](danger-grading.md#private-routing).
 - A bounded pass is written as "no violation within the checked bounds", with the bounds.
 - A property added after a failure was already known is marked as such next to its trace.
 

@@ -1,0 +1,5 @@
+row_a	row_b	relation	contradiction	who_is_right	note
+# A-01	B-01	same	no		
+# A-02	B-02	narrower	no		B also counts the transfer path as a writer
+# A-03	B-03	overlap	yes	b	the guard at src/pool.py:42 rejects a stale generation, as B says
+# A-04		only_here	no		the timeout writer is listed by A only

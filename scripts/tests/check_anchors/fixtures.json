@@ -1,0 +1,861 @@
+{
+  "script": "check_anchors.py",
+  "cases": [
+    {
+      "name": "all-write-forms",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 0,
+      "contains": [
+        "8 Python write sites checked",
+        "WRITE source.py:6: count"
+      ]
+    },
+    {
+      "name": "citations-only",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "0 Python write sites checked"
+      ]
+    },
+    {
+      "name": "uncovered-line-3",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "ERROR source.py:3: attribute count has no write row"
+      ]
+    },
+    {
+      "name": "uncovered-line-4",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "ERROR source.py:4: attribute count has no write row"
+      ]
+    },
+    {
+      "name": "uncovered-line-5",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "ERROR source.py:5: attribute count has no write row"
+      ]
+    },
+    {
+      "name": "uncovered-line-6",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "ERROR source.py:6: attribute count has no write row"
+      ]
+    },
+    {
+      "name": "uncovered-line-7",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "ERROR source.py:7: attribute count has no write row"
+      ]
+    },
+    {
+      "name": "uncovered-line-8",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "ERROR source.py:8: attribute count has no write row"
+      ]
+    },
+    {
+      "name": "uncovered-line-9",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "ERROR source.py:9: attribute count has no write row"
+      ]
+    },
+    {
+      "name": "uncovered-line-10",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "ERROR source.py:10: attribute count has no write row"
+      ]
+    },
+    {
+      "name": "bad-1-10",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:99@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "source line does not exist"
+      ]
+    },
+    {
+      "name": "bad-1-11",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:0@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "site must be"
+      ]
+    },
+    {
+      "name": "bad-1-12",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "site must be"
+      ]
+    },
+    {
+      "name": "bad-1-13",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\t../outside.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "stay under source root"
+      ]
+    },
+    {
+      "name": "bad-1-14",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\t/outside.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "stay under source root"
+      ]
+    },
+    {
+      "name": "bad-1-15",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tmissing.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "No such file"
+      ]
+    },
+    {
+      "name": "bad-2-16",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\tinvalid\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "invalid kind"
+      ]
+    },
+    {
+      "name": "bad-3-17",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tinvalid\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "invalid status"
+      ]
+    },
+    {
+      "name": "bad-4-18",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\t\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "requires model_operator"
+      ]
+    },
+    {
+      "name": "bad-6-19",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\twrong quote\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "does not match"
+      ]
+    },
+    {
+      "name": "bad-6-20",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\t\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "does not match"
+      ]
+    },
+    {
+      "name": "bad-0-21",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\n\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "state_field is required"
+      ]
+    },
+    {
+      "name": "non-modeled-writes",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tout_of_scope\t\tCovered by a different slice\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tassumed_env\t\tEnvironment owns this update\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK anchors:"
+      ]
+    },
+    {
+      "name": "missing-reason",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tout_of_scope\t\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tassumed_env\t\tEnvironment owns this update\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "requires reason"
+      ]
+    },
+    {
+      "name": "normalized-whitespace",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count   =   0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK anchors:"
+      ]
+    },
+    {
+      "name": "hold-is-not-write",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\thold\tmodeled\tUpdate\t\tself.count   =   0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "has no write row"
+      ]
+    },
+    {
+      "name": "read-is-not-write",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\tread\tmodeled\tUpdate\t\tself.count   =   0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "has no write row"
+      ]
+    },
+    {
+      "name": "bad-header",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "wrong\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "header must be"
+      ]
+    },
+    {
+      "name": "short-row",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "expected 7 columns"
+      ]
+    },
+    {
+      "name": "empty-anchors",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\n\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "no anchor rows"
+      ]
+    },
+    {
+      "name": "empty-fields",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "# none\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "no attribute names"
+      ]
+    },
+    {
+      "name": "bad-fields",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "self.count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "expected one attribute name"
+      ]
+    },
+    {
+      "name": "syntax-error",
+      "files": {
+        "source/source.py": "def broken(\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "ERROR source.py:"
+      ]
+    },
+    {
+      "name": "missing-path",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py",
+        "--paths",
+        "missing.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "matches nothing"
+      ]
+    },
+    {
+      "name": "directory",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py",
+        "--paths",
+        "."
+      ],
+      "exit": 0,
+      "contains": [
+        "OK anchors:"
+      ]
+    },
+    {
+      "name": "escaped-glob",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py",
+        "--paths",
+        "../*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "stay under source root"
+      ]
+    },
+    {
+      "name": "non-python",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n",
+        "source/file.txt": "text\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py",
+        "--paths",
+        "file.txt"
+      ],
+      "exit": 1,
+      "contains": [
+        "expected a Python source file"
+      ]
+    },
+    {
+      "name": "dynamic-and-container-limits",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n",
+        "source/extra.py": "setattr(obj, name, 1)\nobj.count.append(1)\nobj.count[0] = 1\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK anchors:"
+      ]
+    },
+    {
+      "name": "symlink-outside-root",
+      "files": {
+        "source/source.py": "class Queue:\n    def update(self, peer):\n        self.count = 0\n        self.count += 1\n        self.count: int = 2\n        setattr(self, \"count\", 3)\n        del self.count\n        self.count, peer.count = 4, 5\n        (self.count,\n         peer.count) = (6, 7)\n        self.other = 8\n        self.counts.append(1)\n",
+        "fields.txt": "count\n",
+        "anchors.tsv": "state_field\tsite\tkind\tstatus\tmodel_operator\treason\tquoted_code\ncount\tsource.py:3@abc123\twrite\tmodeled\tUpdate\t\tself.count = 0\ncount\tsource.py:4@abc123\twrite\tmodeled\tUpdate\t\tself.count += 1\ncount\tsource.py:5@abc123\twrite\tmodeled\tUpdate\t\tself.count: int = 2\ncount\tsource.py:6@abc123\twrite\tmodeled\tUpdate\t\tsetattr(self, \"count\", 3)\ncount\tsource.py:7@abc123\twrite\tmodeled\tUpdate\t\tdel self.count\ncount\tsource.py:8@abc123\twrite\tmodeled\tUpdate\t\tself.count, peer.count = 4, 5\ncount\tsource.py:9@abc123\twrite\tmodeled\tUpdate\t\t(self.count,\ncount\tsource.py:10@abc123\twrite\tmodeled\tUpdate\t\tpeer.count) = (6, 7)\n",
+        "outside.py": "obj.count = 1\n"
+      },
+      "args": [
+        "--source-root",
+        "{tmp}/source",
+        "--anchors",
+        "{tmp}/anchors.tsv",
+        "--fields",
+        "{tmp}/fields.txt",
+        "--paths",
+        "**/*.py"
+      ],
+      "exit": 1,
+      "contains": [
+        "outside source root"
+      ],
+      "symlinks": {
+        "source/escape.py": "outside.py"
+      }
+    },
+    {
+      "name": "usage",
+      "args": [],
+      "exit": 2,
+      "contains": [
+        "ERROR arguments:"
+      ]
+    },
+    {
+      "name": "paired-scan-options",
+      "args": [
+        "--source-root",
+        "{tmp}",
+        "--anchors",
+        "{tmp}/input",
+        "--fields",
+        "{tmp}/fields"
+      ],
+      "exit": 2,
+      "contains": [
+        "must be supplied together"
+      ]
+    },
+    {
+      "name": "help",
+      "args": [
+        "--help"
+      ],
+      "exit": 0,
+      "contains": [
+        "lower bound",
+        "Aliases",
+        "native code"
+      ]
+    }
+  ]
+}

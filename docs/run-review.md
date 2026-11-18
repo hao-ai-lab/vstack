@@ -2,6 +2,22 @@
 
 Before running, timestamp the sentence you expect to report. Record input hashes, tools, settings and resource limits. Do not interpret a process exit code as a correctness theorem.
 
+## Run order and budget
+
+Run in this order and stop at the first failure: pin check, syntax and header checks, the smallest scale with
+safety properties only, the real-code check with a small seed budget, then larger scales. Start bounded symbolic
+checking or liveness runs only when the property's [formal class](method-selection.md#property-classes-and-the-seven-pillars)
+needs them: symbolic checking for an inductive-invariant question, liveness for `Progress`, never by default.
+
+Collect action coverage once, at the smallest scale reaching the [concurrency witness](../skills/vstack-s3-model/SKILL.md).
+Larger scales may run without recollecting it, but this does not relax [Layer 0](layer-0.md): a configuration
+whose required action coverage was never collected, or is zero, still cannot pass. Retain the evidence and its
+configuration identity; coverage from another scale does not establish an unmeasured configuration's pass.
+
+Budget one hour of exhaustive search per unit at the smallest scale reaching that witness. A run hitting the
+limit is `TIME_LIMIT`, never a pass; record the unit as over budget. It may continue with sampled runs reported
+as samples. These run-order and budget checks are documented-only.
+
 ## Model checks and measurements
 
 Read constants, state and action constraints, symmetry, view, properties and worker count. Ask seven questions:
@@ -18,7 +34,7 @@ Report **violation found**, **passed within stated bounds** or **INCONCLUSIVE**.
 
 Read the final summary of generated and distinct states, not a progress line. Violation counts from multi-worker searches can vary with scheduling; do not silently require exact counts for those rows. The source rerun table distinguishes exact checks from informational state counts.
 
-A killed mutant must violate the expected property **and follow the expected mechanism**. Compare the historic switch combination to the actual pinned revision. A repair component outside the abstraction's reach is unverified, not proved unnecessary. Pair each positive run with its reachability witness under the same constants.
+A killed mutant must violate the expected property **and follow the expected mechanism**: the same configuration without the mutation passes that property at the same scale, and the counterexample takes the mutated action. Compare the historic switch combination to the actual pinned revision. A repair component outside the abstraction's reach is unverified, not proved unnecessary. Pair each positive run with its reachability witness under the same constants.
 
 ### Environment restrictions and freedoms
 

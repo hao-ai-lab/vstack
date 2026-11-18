@@ -1,0 +1,10 @@
+row_a	row_b	relation	contradiction	who_is_right	note
+A-01	B-05	equal	no		case:bad-relation
+A-01	B-05	only_here	no		case:only-both
+A-01		same	no		case:same-one-side
+A-99	B-01	overlap	no		case:unknown-row
+A-01	B-05	overlap	maybe		case:bad-contra
+A-01	B-05	overlap	yes		case:contra-no-right
+A-01	B-05	overlap	no	a	case:right-without-contra
+	B-05	only_here	yes	a	case:only-contra
+A-01	B-01	same	no		case:duplicate-pair

@@ -1,0 +1,4 @@
+unit	config_or_mutant	kind	scale	mutant_of	clauses	model_verdict	model_violated	model_evidence	mutation_reached	real_code_method	real_code_verdict	code_violated	seeds_or_traces	hits	agreement	resolution	evidence_level
+# queue	pinned-baseline	baseline	slots=3;requests=2	n/a	C1;C2	violation	C1	evidence/baseline.log	n/a	stateful_test	violation	C1	seeds 1-20	4	agree		CPU replay of real code
+# queue	pinned-repaired	control	slots=3;requests=2	n/a	C1;C2	pass	none	evidence/repaired.log	n/a	stateful_test	pass	none	seeds 1-20	0	agree		CPU replay of real code
+# queue	MutDropGuard	mutant	slots=3;requests=2	pinned-repaired	C1;C2	violation	C2	evidence/mutant.log	yes	stateful_test	violation	C2	seeds 1-20	7	agree		CPU replay of real code

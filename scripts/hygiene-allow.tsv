@@ -1,0 +1,4 @@
+rule	path	reason
+case-data	templates/*.tsv	templates hold a header and commented example rows with neutral names, no campaign data
+case-data	scripts/tests/*	synthetic fixtures of the bundled checkers
+case-data	bugs/verified-bugs.csv	the published bug ledger behind the public tracker sheet: a product of the project, not working data of a campaign

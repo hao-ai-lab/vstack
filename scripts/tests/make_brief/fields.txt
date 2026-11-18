@@ -1,0 +1,25 @@
+# Fields of templates/task-brief.md for the generator's self-test; {tmp} is the test's scratch directory.
+# One field per slot: `name: value`, or `name:` followed by lines indented by two spaces.
+unit id: U-01
+title: writers of the buffer slot table
+goal:
+  The property owner wants every writer of the buffer slot table listed with its guard, so that the model of unit
+  U-01 starts from a complete census of source revision `abc1234`. Three earlier tables hold
+  {{rows of {tmp}/fail-1.tsv {tmp}/fail-2.tsv {tmp}/fail-3.tsv}} to revisit, of which
+  {{rows of {tmp}/fail-1.tsv {tmp}/fail-2.tsv {tmp}/fail-3.tsv where verdict=}} are undecided.
+inputs:
+  - `{tmp}/resources.tsv`: the shared resource and its subsystems.
+  - `{tmp}/src`: the pinned source tree.
+writable:
+  - `{tmp}/out/U-01`
+blind: no
+forbidden:
+  - Python files only through `bash guard.sh 4 PYTHON <file> <args>`.
+outputs:
+  - `UNITS.tsv`: {{header of templates/unit-table.tsv}}.
+  - `slides/<id>.html`: one page per unit, keeping the marker `[TBD-cmp2]` until the count arrives.
+  - Literal: `[TBD-cmp2]`: the marker the slides keep.
+checks:
+  - command: `python3 scripts/check_unit_table.py {tmp}/out/U-01/UNITS.tsv --no-plan`
+    last line matches: `OK unit table: [0-9]+ units .*`
+reply: Above the block, reply in English, in two lines.
