@@ -40,22 +40,20 @@ Run `/vstack-mode` on a target module and safety property:
 | Gate | What It Enforces |
 | :--- | :--- |
 | **[Role isolation](docs/layer-0.md)** | Separate coordinator, worker, and red-team agents keep specs, modeling, and review independent. |
-| **[Hash-pinned specs](docs/contracts.md)** | SHA-256 locks safety properties and theorem signatures so workers cannot weaken the goal. |
-| **[Line-anchored models](docs/method-selection.md)** | Every state variable and action maps to an exact `file:line@commit` across TLC, Apalache, and Z3. |
+| **[Hash-pinned specs](docs/contracts.md)** | SHA-256 locks safety properties, theorem signatures, and task briefs so workers cannot weaken the goal. |
+| **[Line-anchored models](docs/method-selection.md)** | Every state variable, action, and write site maps to a verified `file:line@commit` across TLC, Apalache, and Z3. |
 | **[Mutation & trace gates](docs/gates.md)** | Models must fail on historical bugs, pass with the fix, fail when guards are removed, and [replay real traces](docs/trace-validation.md). |
-| **[Exposure gate](docs/exposure-gate.md)** | A finding is reported as caught by formal checking only if a faithful model with every bug switch off violates a named property, a red team fails to refute it, and it reproduces on a real engine next to a passing control. Shell models, experiment-only failures and calibration runs do not count. |
-| **Proof & runtime checks** | Critical state machines scale to unbounded TLAPS proofs with preconditions mirrored as runtime checks. |
-| **[Coordination checks](docs/rule-registry.md)** | Task briefs are generated from templates by fields and checked by script, down to the counts, ids and blind lists they state; a hand-back's claimed result must end its own log, the ids its outputs name must exist and its changes must stay inside its own writable list; every planned unit needs a row with evidence, every brief sent its recorded worker, one unit goes first, and key units are written twice and compared row by row. Each rule is registered with its enforcer. |
-| **Run and record checks** | [`check_names.py`](scripts/check_names.py) refuses rows that name a class, function or field absent from the source; [`check_census_fixes.py`](scripts/check_census_fixes.py) checks census-correction records; [`check_refusals.py`](scripts/check_refusals.py) checks that each refused or ineffective operation answers both questions of the refusal rule and lists the documentation read; [`freeze_tools.py`](scripts/freeze_tools.py) freezes a hashed, read-only copy of the scripts and templates for running tasks; [`gpu_pack.py`](scripts/gpu_pack.py) packs up to four one-GPU runs into one job of a shared queue ([GPU check jobs](docs/gpu-jobs.md)); [`refuse_inline_python.py`](scripts/refuse_inline_python.py) is a shell hook that refuses inline Python outside the project guard. |
+| **[Exposure & danger grading](docs/exposure-gate.md)** | Findings must survive red-team refutation, reproduce on a real engine, and pass [fact-based grading and private routing](docs/danger-grading.md). |
+| **[Proof & runtime checks](docs/gates.md#deductive-proof-acceptance)** | Critical state machines scale to unbounded TLAPS proofs with preconditions mirrored as runtime checks. |
 
-The **[model adequacy readout](docs/model-adequacy.md)** is not a gate: it reports how closely a model follows its code (trace acceptance, historical fix coverage and blind detection recall, each with its denominator and interval) and sets no thresholds. Bug hunts report a light version; full verification and regression skills report all of it.
+See the **[model adequacy readout](docs/model-adequacy.md)** for how models are evaluated against real code, the **[rule registry](docs/rule-registry.md)** for the full list of mechanical CLI checks (`vstack gate`), and **[working principles](docs/principles.md)** for our verification workflow rules.
 
 ## Recommended Models
 
 | Workflow Stage | Recommended Models | Why |
 | :--- | :--- | :--- |
-| **Modeling, Proofs & Red-Team** | `Fable 5.2`, `GPT-6.1-Sol`, `Gemini 4 Carbon` at high reasoning effort | Strongest at state-machine abstraction, inductive invariants, and catching missing guards. |
-| **Code Analysis & Repro Harness** | `Claude Opus 5.5`, `Gemini 4 Carbon` | Fast and reliable at navigating large Python/CUDA codebases and building multi-GPU reproducers. |
+| **Modeling, Proofs & Red-Team** | `Fable 5.2`, `GPT-6.2-Astra`, `Gemini 4 Neon`, `GPT-6.1-Sol`, `Gemini 4 Carbon` at high reasoning effort | Strongest at state-machine abstraction, inductive invariants, and catching missing guards. |
+| **Code Analysis & Repro Harness** | `Claude Opus 5.5`, `Gemini 4 Neon`, `GPT-6.2-Astra`, `Gemini 4 Carbon` | Fast and reliable at navigating large Python/CUDA codebases and building multi-GPU reproducers. |
 
 ## Case Studies
 
