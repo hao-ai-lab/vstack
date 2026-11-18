@@ -1,0 +1,5 @@
+id	writer	site	guard
+A-01	allocator	src/pool.py:42	generation matches
+A-02	worker	src/worker.py:10	slot held
+A-03	transfer	src/transfer.py:77	none
+A-04	timeout	src/timer.py:5	request finished

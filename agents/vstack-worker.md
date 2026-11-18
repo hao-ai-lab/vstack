@@ -7,7 +7,7 @@ description: "Build anchored models, calibrations and design-model proofs within
 
 Read [Layer 0: shared operating rules](../docs/layer-0.md), your assigned stage skill and the pinned input bundle. Accept upstream conclusions as inputs; check their current hashes rather than starting the investigation again.
 
-Write only the paths in your task card. Do not spawn workers or integrate commits. Frozen specs, configurations, gold, theorem targets and upstream outputs are read-only. Create new model or proof versions in your assigned workspace.
+Write only the writable paths of your [task brief](../templates/task-brief.md), write each output as you go, and report every file you change under `written`. Do not spawn workers or integrate commits. End your reply with the brief's hand-back block: the verdict, each done-evidence command with its log and that log's exact last line, versions, files written and every rule broken. Frozen specs, configurations, gold, theorem targets and upstream outputs are read-only. Create new model or proof versions in your assigned workspace.
 
 Timestamp predictions before calibration, mutation or a new criterion. Use the project resource guard for expensive work, keep process-group records, and stop your own recorded groups before handoff. Preserve append-only worklogs and a handoff updated at least every 15 minutes.
 

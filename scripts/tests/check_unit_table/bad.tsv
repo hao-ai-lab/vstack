@@ -1,0 +1,15 @@
+unit_id	resource	subsystems	k	plane	entry_kind	tier	properties	method	budget_result	evidence_level	status	brief	owner	output_dir	batch	first_of_batch	key	evidence
+bad-status	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	not_run	none	done	bad/briefs/bad-status.md	worker-11	bad/bad-status/	x1	yes	no	bad/bad-status/HANDBACK.txt
+bad-first	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	not_run	none	queued			bad/bad-first/	x2	maybe	no	
+bad-key	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	not_run	none	queued			bad/bad-key/	x3	yes	y	
+no-batch	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	not_run	none	queued			bad/no-batch/		yes	no	
+no-owner	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	not_run	none	running			bad/no-owner/	x5	yes	no	
+no-outdir	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	not_run	none	queued				x6	yes	no	
+no-evidence	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	within	model only	pass	bad/briefs/no-evidence.md	worker-12	bad/no-evidence/	x7	yes	no	
+missing-evidence	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	within	model only	accepted	bad/briefs/missing-evidence.md	worker-13	bad/missing-evidence/	x8	yes	no	bad/missing-evidence/absent.txt
+outside-evidence	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	within	model only	issues	bad/briefs/outside-evidence.md	worker-14	bad/outside-evidence/	x9	yes	no	shared/HANDBACK.txt
+key-one-owner	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	within	model only	pass	bad/briefs/key-one-owner.md	worker-15	bad/key-one-owner/	x10	yes	yes	bad/key-one-owner/writing-compare.tsv
+key-no-compare	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	within	model only	accepted	bad/briefs/key-no-compare.md	worker-16;worker-17	bad/key-no-compare/	x11	yes	yes	bad/key-no-compare/HANDBACK.txt
+brief-no-worker	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	not_run	none	queued	bad/briefs/brief-no-worker.md		bad/brief-no-worker/	x12	yes	no	
+no-brief	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	not_run	none	running		worker-18	bad/no-brief/	x13	yes	no	
+missing-brief	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	not_run	none	running	bad/briefs/absent-brief.md	worker-19	bad/missing-brief/	x14	yes	no	

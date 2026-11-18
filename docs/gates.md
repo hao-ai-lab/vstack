@@ -2,7 +2,7 @@
 
 These adapted repository checks provide no solver, project model or end-to-end acceptance runner. Use the project's resource guard. The commands below define interfaces; they are not results from an installed project.
 
-Requirements: Bash with associative arrays and `mapfile`, GNU grep at `/usr/bin/grep`, GNU coreutils with `sha256sum` and `readlink -f`; awk, sed and diff; Python 3 for the scope audit and the document check; Git for the scope audit. Platform compatibility and solver integration have not been exercised for this package. See [acceptance limits](#legacy-tlc-label-parser).
+Requirements: Bash with associative arrays and `mapfile`, GNU grep at `/usr/bin/grep`, GNU coreutils with `sha256sum` and `readlink -f`; awk, sed and diff; Python 3 for the scope, document, agreement, anchor, TLC log, brief, hand-back, unit-table, writing-comparison, hygiene, name, census-correction and refusal checks, the tool freeze, the GPU job packer and the inline-Python hook; Git for the scope audit, the hygiene scan and the tool freeze; `nvidia-smi` on GPU hosts for the packer (Linux, for CPU pinning). Platform compatibility and solver integration have not been exercised for this package. See [acceptance limits](#legacy-tlc-label-parser).
 
 ## Pin check
 
@@ -53,7 +53,64 @@ tlc_states CHECKER_LOG
 
 These functions come from `rerun.sh`; they run no solver. Recognized invariant, action, temporal and deadlock violations take precedence over later success. Next come the timeout exit code, then the success marker; otherwise the parser emits an error label. `tlc_states` extracts the last matching distinct-state count.
 
-**A printed `PASS` is not acceptance.** The function can accept nonzero exits, unknown or generic errors followed by success, empty exploration, and missing or zero required action coverage. Its shell return code is not the verdict. The source caller checked exact state counts only for selected rows. Require a project runner that enforces the full fail-closed sequence, final summaries and coverage. No complete generic runner is bundled.
+**A printed `PASS` is not acceptance.** The function can accept nonzero exits, unknown or generic errors followed by success, empty exploration, and missing or zero required action coverage. Its shell return code is not the verdict. The source caller checked exact state counts only for selected rows. Require a project runner that enforces the full fail-closed sequence, final summaries and coverage. Use the [TLC run verdict](#tlc-run-verdict) as the acceptance check for finished TLC logs; the project still supplies execution and evidence identity checks.
+
+## TLC run verdict
+
+```sh
+python3 scripts/run_tlc_gate.py --log LOG --exit-code N [--required-actions FILE] [--simulate] [--time-limit-hit]
+vstack gate run-tlc --log LOG --exit-code N
+```
+
+This read-only classifier does not run TLC. It prints exactly one verdict line:
+
+```text
+VERDICT <kind> states=<distinct or NA> queue=<left on queue or NA>
+```
+
+| Kind | Meaning | Exit |
+|---|---|---|
+| `COMPLETE_PASS` | Success marker, final summary with positive distinct and generated counts, queue zero, exit zero, and nonzero coverage of every requested action. | 0 |
+| `VIOLATION` | Invariant, action-property, temporal or deadlock violation; takes precedence over every other result, including later success. | 1 |
+| `TIME_LIMIT` | Caller reports the limit, the final summary is absent, or the exhaustive queue is unfinished. | 1 |
+| `ERROR` | Nonzero exit, a non-property error, or a completed exhaustive log without the success marker. | 1 |
+| `EMPTY` | Zero distinct states or no generated states. | 1 |
+| `COVERAGE_MISSING` | A requested action is absent or zero, or a required-actions file was supplied but no complete coverage report exists. | 1 |
+| `SAMPLED_NO_VIOLATION` | A completed simulation without a violation; a sample, never an exhaustive pass. | 3 |
+
+Bad usage or unreadable inputs exit 2 with `ERROR <where>: <reason>` diagnostics. With valid inputs, the order
+after violations is explicit time limit, error/nonzero exit, missing summary, empty exploration, unfinished queue,
+required coverage, then sampled or exhaustive success. Other than violations, an explicit limit takes priority
+over errors; errors take priority over an absent summary.
+
+Supply one complete English TLC console log and the real process exit status. The classifier trusts the
+caller's time-limit flag; set `--simulate` for simulation (the standard simulation banner is also detected).
+It reads final state summaries, not progress lines. Coverage parsing supports only the formats listed in
+`--help`: action-location headers with a single count or a `distinct:total` pair inside the last complete
+coverage block. Nested expression counts do not substitute for action coverage. The required-actions file
+contains one action name per line, with blank and comment lines ignored; an empty list fails. Omitting it
+does not establish required coverage: apply the [run-order coverage rule](run-review.md#run-order-and-budget).
+The classifier cannot bind a log to source pins, validate witnesses, or accept a different output format by
+inference. The project must supply those checks.
+
+## Finding record and danger grade
+
+```sh
+python3 scripts/grade_findings.py findings.tsv [--write graded-findings.tsv]
+vstack gate grade-findings findings.tsv
+```
+
+Read-only on its input. It validates the [finding record](../templates/finding-record.tsv) header, required
+fields, enumerations, the fixed forms of structured fields (free text there is refused), counts and their kind,
+preconditions, the three repair arms with their reference kind, the independent reviewer, the `real_but_narrow` and
+`undetermined` verdicts and the lower reading of ambiguous facts, and rejects stored tier, grade or route values that
+disagree with [danger grading](danger-grading.md). It compares literal long options and leading environment
+assignments of the actual launch command against the documented default, which must name the same executable;
+positional arguments and short options are ignored. An `unknown` launch or fact yields an `unknown` tier or grade
+and the route `await_facts`, never `tier0`. `--write` fills the computed fields in a new output file, never the input. Exit zero establishes record consistency, not exposure-gate acceptance: evidence, command
+semantics, the confirmation of the private-routing markers (`cross_request_data:`, `availability:`; an unmarked
+service-ending impact is refused) and agreement with the reference arm remain manual, and a pending finding stays
+on hold.
 
 ## Deductive proof acceptance
 
@@ -129,6 +186,131 @@ Read-only. Exit zero means zero errors in these checks:
 | Versions | The five version manifests carry one `MAJOR.MINOR.PATCH` version. |
 
 `--links-only` checks an installed tree such as `<base>/.claude`. The real-engine test is a keyword match on the evidence text and the shell-model list is kept by hand in the script; neither judges evidence.
+
+## Coordination and hygiene checks
+
+```sh
+python3 scripts/make_brief.py FIELDS --out BRIEF.md [--template FILE] [--force]
+python3 scripts/check_brief.py BRIEF.md [--template FILE] [--hand-written]
+python3 scripts/parse_handback.py REPLY [--brief BRIEF.md] [--ref OUTPUT COLUMN TABLE ID] [--changed FILE --tree DIR --sibling BRIEF.md]
+python3 scripts/check_unit_table.py UNITS.tsv (--plan PLAN | --no-plan) [--final] [--briefs DIR]
+python3 scripts/check_writings.py COMPARE.tsv --a A.tsv --b B.tsv [--base a|b]
+python3 scripts/check_hygiene.py [ROOT] [--deny FILE] [--untracked] [--commits BASE..HEAD]
+```
+
+The brief generator and read-only checks of the coordinator's task briefs, workers' hand-back blocks, the unit table,
+the comparison of two writings of a key unit and the repository itself (`vstack gate make-brief`, `check-brief`,
+`parse-handback`, `check-unit-table`, `check-writings`, `check-hygiene`). The generator writes only its `--out` file. Their rules, interfaces and limits are in the
+[rule registry](rule-registry.md#coordination-and-hygiene-checks); each prints `--help`. They check form and
+consistency with the named logs and files, not whether the work is right.
+
+Before a push, run the hygiene check with `--commits` on the range the push publishes, for example
+`--commits origin/main..HEAD`. A push carries every commit of the range, so a file cleaned in the working tree
+still goes out in the older commit that holds it; the check scans every file version a commit of the range adds or
+changes and every commit message, and fails on a range with no commits. Keep data and tool changes in separate
+commits, so that one can be replaced without the other.
+
+## Name check
+
+```sh
+python3 scripts/check_names.py SOURCE TABLE.tsv --column NAME [--column NAME] [--id-column NAME] [--allow FILE]
+```
+
+Read-only. At acceptance, a table whose sentences name code (property clauses, instance sentences, census rows)
+is refused when a class, function or field it names does not exist in the source tree at the pinned revision. The
+index holds identifiers of code only, not of comments, docstrings or documents, and names match whole, so an
+abbreviated class name that is a prefix of a real one is missing. `--help` lists the word shapes taken as code
+names. A CamelCase product or model name needs an entry in the `--allow` file (`name`, `reason`); every entry must
+be used. The check does not verify that a named method belongs to the named class.
+
+## Census corrections
+
+```sh
+python3 scripts/check_census_fixes.py FIXES.tsv --table NAME=PATH [--table NAME=PATH] [--source SOURCE]
+python3 scripts/check_census_fixes.py --template
+```
+
+A correction of a census row, found by a second census, a second pass or a review, is recorded with who made it,
+which row of which table (`row_key`), the field, the wrong and the right value, its kind (`missed_write`,
+`not_shared`, `wrong_subsystem`, `wrong_access`, `wrong_site`, `wrong_condition`, `wrong_lifetime`), what found it
+and `path:line` evidence. With `--table`, the table must now hold the right value (a recorded correction that was
+never applied fails), a missed row must exist and a removed row must be gone; with `--source`, every cited line
+must exist. See [S0](../skills/vstack-s0-decompose/SKILL.md#2-procedure) step 4.
+
+## Refusal record
+
+```sh
+python3 scripts/check_refusals.py REFUSALS.tsv [--docs DOC_ROOT]
+```
+
+The two questions of the refusal rule for every refused or ineffective operation of a check on real code, with the
+documentation read; see [checks derived from a clause](contracts.md#refusal-record).
+
+## Frozen tool copies
+
+```sh
+python3 scripts/freeze_tools.py DEST --rev COMMIT [--path scripts --path templates]
+python3 scripts/freeze_tools.py --verify DEST [--root REPO]
+```
+
+Tasks that run while the toolkit itself is being changed use a read-only copy of the scripts and templates of one
+commit, never the live worktree: a template or grader changed under running tasks makes one task's output fail
+the new check and another hand in two formats. The copy carries a SHA-256 manifest (`FREEZE.sha256`, the
+`sha256sum` format that [the pin check](#pin-check) also reads) and the commit it came from (`FREEZE.txt`); it is
+written next to `DEST` and renamed into place, and a second freeze of other content into the same `DEST` is
+refused. Briefs name `DEST/scripts/...` and `DEST/templates/...`; a task moves to a new version only through a new
+brief naming a new copy. `--verify` checks the hashes, that no file was added or removed, that nothing is
+writable and, with `--root`, that the copy still equals its commit. The read-only mode is a marker, not a lock:
+the manifest is what proves the copy unchanged.
+
+## Shared GPU queue jobs
+
+```sh
+python3 scripts/gpu_pack.py check JOB.json --mine PREFIX
+python3 scripts/gpu_pack.py run JOB.json --out DIR --claim DIR --mine PREFIX
+python3 scripts/gpu_pack.py order QUEUE_DIR --mine PREFIX
+```
+
+One job packs up to four one-GPU runs, each with its own GPU and CPUs, a time cap, GPU memory back to idle and one
+claim across the queues it was offered to; our job names sort after the other team's. Template and rules:
+[GPU check jobs in a shared queue](gpu-jobs.md).
+
+## Inline Python hook
+
+Project rules forbid running Python code written inline in an agent's shell (`python3 -c ...`, `python3 -` with a
+here-document or a pipe) outside the project's resource guard. A sentence in every brief did not stop it: three
+agents each typed `python3 -` once in one evening. [`scripts/refuse_inline_python.py`](../scripts/refuse_inline_python.py)
+refuses such a command before it runs. It finds the interpreter behind `env`, `nice`, `timeout`, `taskset`,
+`sudo`, `xargs`, `uv run` and similar wrappers, after `;`, `&&`, `|` and newlines, and inside `bash -c`, `eval`,
+`find -exec`, `$(...)` and backticks; a script file, `-m MODULE`, `--version` and everything run by the guard pass.
+
+Install it for Claude Code as a `PreToolUse` hook on the Bash tool, in the project's `.claude/settings.json` or the
+user's `~/.claude/settings.json`, with the absolute path of the installed script and the project's guard:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /ABSOLUTE/PATH/scripts/refuse_inline_python.py --guard compute/guard.sh --hint 'bash compute/guard.sh ROLE MEM /usr/bin/python3 -B FILE ARGS'"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The hook reads the tool call as JSON on standard input; exit 2 refuses the call and shows the reason to the agent,
+exit 0 lets it run, and unreadable input exits 1, which is reported and does not block. A harness with another
+pre-command hook can call `refuse_inline_python.py --guard GUARD --command 'TEXT'` and refuse on exit 2. Try it
+with `--command 'python3 -'` (exit 2) and `--command 'python3 tool.py'` (exit 0) after installing. It does not see
+commands a shell reads from a pipe, scripts written first and run later, aliases or functions; it is a guard rail
+for a habit, not a sandbox.
 
 ## Mutation gate
 

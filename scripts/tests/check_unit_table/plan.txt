@@ -1,0 +1,7 @@
+# Planned units of the self-test
+U-01
+U-02
+U-03
+U-04
+U-05
+U-06

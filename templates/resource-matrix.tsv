@@ -1,0 +1,3 @@
+resource	subsystem	plane	access	site	condition	census_a	census_b	settled_by
+# buffer_slots	allocator	control	write	src/pool.py:42	default	census-a/pool.tsv	census-b/pool.tsv	coordinator:review/pool.md
+# buffer_slots	transfer	both	hold	src/transfer.py:77	transfer_enabled	census-a/pool.tsv	census-b/pool.tsv	coordinator:review/pool.md

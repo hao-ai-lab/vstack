@@ -1,0 +1,11 @@
+Done, everything passed.
+
+BEGIN HANDBACK
+verdict: DONE
+check: python3 /opt/verify/tools/check_writers.py out/WRITERS.tsv
+last line: OK writers: 0 errors
+status: finished
+written: out/WRITERS.tsv
+rules broken: none
+rules broken: read another worker's folder
+END HANDBACK

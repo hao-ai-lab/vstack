@@ -16,6 +16,6 @@ Stop at the S6 deliverable: classified, reproducible findings and validated repa
 
 The [exposure gate](../../../docs/exposure-gate.md) is checked per stage: Gates 1 and 3 at S6, Gate 2 at S5, Gate 4 by the coordinator. Only a finding that holds every gate applying to its method is listed as verified (`@github_handle`).
 
-This playbook takes the hunt track of the [model adequacy readout](../../../docs/model-adequacy.md#tracks): `InputEnabled_<E>` invariants and `W_*` witnesses are required; `TAR` may be `N/A (no trace harness)`; no historical denominator or blind matrix.
+This playbook takes the hunt track of the [model adequacy readout](../../../docs/model-adequacy.md#tracks): `InputEnabled_<E>` invariants, `W_*` witnesses, the anchor map and the [S4 agreement record](../../../docs/model-adequacy.md#readout-1-trace-and-baseline-agreement) are required; no historical denominator or blind matrix. `TAR = N/A` is allowed only with the `model only` evidence level under that agreement rule.
 
 On an upstream defect, send a rollback ticket to that stage; never edit its frozen artifact from a downstream role. The coordinator reruns accepted outputs independently.

@@ -1,0 +1,10 @@
+unit_id	resource	subsystems	k	plane	entry_kind	tier	properties	method	budget_result	evidence_level	status	brief	owner	output_dir	batch	first_of_batch	key	evidence
+# Batch b1: the first unit was accepted before the others started.
+U-01	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	within	model only	accepted	briefs/U-01.md	worker-01	units/U-01/	b1	yes	no	units/U-01/HANDBACK.txt;units/U-01/logs/
+U-02	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	within	model only	accepted	briefs/U-02.md	worker-02	units/U-02/	b1	no	no	units/U-02/HANDBACK.txt
+U-03	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	within	model only	accepted	briefs/U-03.md	worker-03;worker-04	units/U-03/	b1	no	yes	units/U-03/HANDBACK.txt;units/U-03/writing-compare.tsv
+U-04	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	over_budget	none	blocked	briefs/U-04.md	worker-05	units/U-04/	b1	no	no	units/U-04/HANDBACK.txt
+
+# Batch b2: a new brief template, so a new first unit.
+U-05	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	not_run	none	running	briefs/U-05.md	worker-06	units/U-05/	b2	yes	no	
+U-06	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety	model_check	not_run	none	queued			units/U-06/	b2	no	no	

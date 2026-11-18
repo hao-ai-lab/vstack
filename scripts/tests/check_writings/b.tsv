@@ -1,0 +1,6 @@
+id	writer	site	guard
+B-01	allocator	src/pool.py:42	generation matches
+B-02	worker	src/worker.py:10	slot held or transfer pending
+B-03	transfer	src/transfer.py:77	stale generation rejected
+B-04	scheduler	src/sched.py:30	none
+B-05	worker	src/worker.py:12	slot held

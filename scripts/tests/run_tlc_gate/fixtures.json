@@ -1,0 +1,683 @@
+{
+  "script": "run_tlc_gate.py",
+  "cases": [
+    {
+      "name": "complete",
+      "files": {
+        "run.log": "Model checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 0,
+      "stdout": "VERDICT COMPLETE_PASS states=5 queue=0\n"
+    },
+    {
+      "name": "complete-with-coverage",
+      "files": {
+        "run.log": "The coverage statistics at 2026-01-01 00:00:00\n<Step line 3, col 1 to line 3, col 4 of module Model>: 2:10\nEnd of statistics.\nModel checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "Step\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 0,
+      "stdout": "VERDICT COMPLETE_PASS states=5 queue=0\n"
+    },
+    {
+      "name": "coverage-advisory-terminator",
+      "files": {
+        "run.log": "The coverage statistics at 2026-01-01 00:00:00\n<Step line 3, col 1 to line 3, col 4 of module Model>: 2:10\nEnd of statistics (please note that for performance reasons large models\nare best checked with coverage and cost statistics disabled).\nModel checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "Step\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 0,
+      "stdout": "VERDICT COMPLETE_PASS states=5 queue=0\n"
+    },
+    {
+      "name": "coverage-advisory-terminator-zero-count",
+      "files": {
+        "run.log": "The coverage statistics at 2026-01-01 00:00:00\n<Step line 3, col 1 to line 3, col 4 of module Model>: 0:0\nEnd of statistics (please note that for performance reasons large models\nare best checked with coverage and cost statistics disabled).\nModel checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "Step\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT COVERAGE_MISSING states=5 queue=0\n"
+    },
+    {
+      "name": "single-count-coverage",
+      "files": {
+        "run.log": "The coverage statistics at 2026-01-01 00:00:00\n<Step line 3, col 1 to line 3, col 4 of module Model>: 10\nEnd of statistics.\nModel checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "# action\nStep\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 0,
+      "stdout": "VERDICT COMPLETE_PASS states=5 queue=0\n"
+    },
+    {
+      "name": "comma-counts",
+      "files": {
+        "run.log": "Model checking completed. No error has been found.\n1,000 states generated, 1,000 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 0,
+      "stdout": "VERDICT COMPLETE_PASS states=1000 queue=0\n"
+    },
+    {
+      "name": "Invariant Safe is violated",
+      "files": {
+        "run.log": "Error: Invariant Safe is violated\nModel checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "Step\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "124",
+        "--time-limit-hit",
+        "--simulate",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT VIOLATION states=5 queue=0\n"
+    },
+    {
+      "name": "Action property SafeStep is violated",
+      "files": {
+        "run.log": "Error: Action property SafeStep is violated\nModel checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "Step\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "124",
+        "--time-limit-hit",
+        "--simulate",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT VIOLATION states=5 queue=0\n"
+    },
+    {
+      "name": "Temporal properties were violated",
+      "files": {
+        "run.log": "Error: Temporal properties were violated\nModel checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "Step\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "124",
+        "--time-limit-hit",
+        "--simulate",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT VIOLATION states=5 queue=0\n"
+    },
+    {
+      "name": "Deadlock reached",
+      "files": {
+        "run.log": "Error: Deadlock reached\nModel checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "Step\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "124",
+        "--time-limit-hit",
+        "--simulate",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT VIOLATION states=5 queue=0\n"
+    },
+    {
+      "name": "violation-without-summary",
+      "files": {
+        "run.log": "Error: Invariant Safe is violated\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT VIOLATION states=NA queue=NA\n"
+    },
+    {
+      "name": "explicit-limit",
+      "files": {
+        "run.log": "Model checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--time-limit-hit"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT TIME_LIMIT states=5 queue=0\n"
+    },
+    {
+      "name": "no-summary",
+      "files": {
+        "run.log": "Model checking completed. No error has been found.\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT TIME_LIMIT states=NA queue=NA\n"
+    },
+    {
+      "name": "progress-not-summary",
+      "files": {
+        "run.log": "Progress(4) at time: 10 states generated, 5 distinct states found, 0 states left on queue.\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT TIME_LIMIT states=NA queue=NA\n"
+    },
+    {
+      "name": "nonzero-success-legacy-false-pass",
+      "files": {
+        "run.log": "Model checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "7"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT ERROR states=5 queue=0\n"
+    },
+    {
+      "name": "error-then-success",
+      "files": {
+        "run.log": "Error: Evaluation failed\nModel checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT ERROR states=5 queue=0\n"
+    },
+    {
+      "name": "unknown-then-success",
+      "files": {
+        "run.log": "Unknown result\nModel checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT ERROR states=5 queue=0\n"
+    },
+    {
+      "name": "error-no-summary",
+      "files": {
+        "run.log": "Error: Parsing failed\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "1"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT ERROR states=NA queue=NA\n"
+    },
+    {
+      "name": "no-success-marker",
+      "files": {
+        "run.log": "10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT ERROR states=5 queue=0\n"
+    },
+    {
+      "name": "empty-legacy-false-pass",
+      "files": {
+        "run.log": "Model checking completed. No error has been found.\n0 states generated, 0 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT EMPTY states=0 queue=0\n"
+    },
+    {
+      "name": "zero-generated",
+      "files": {
+        "run.log": "Model checking completed. No error has been found.\n0 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT EMPTY states=5 queue=0\n"
+    },
+    {
+      "name": "unfinished-queue",
+      "files": {
+        "run.log": "Model checking completed. No error has been found.\n10 states generated, 5 distinct states found, 2 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT TIME_LIMIT states=5 queue=2\n"
+    },
+    {
+      "name": "no-coverage",
+      "files": {
+        "run.log": "Model checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "Step\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT COVERAGE_MISSING states=5 queue=0\n"
+    },
+    {
+      "name": "zero-coverage-legacy-false-pass",
+      "files": {
+        "run.log": "The coverage statistics at 2026-01-01 00:00:00\n<Step line 3, col 1 to line 3, col 4 of module Model>: 0:0\nEnd of statistics.\nModel checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "Step\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT COVERAGE_MISSING states=5 queue=0\n"
+    },
+    {
+      "name": "absent-action",
+      "files": {
+        "run.log": "The coverage statistics at 2026-01-01 00:00:00\n<Step line 3, col 1 to line 3, col 4 of module Model>: 2:10\nEnd of statistics.\nModel checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "Step\nFinish\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT COVERAGE_MISSING states=5 queue=0\n"
+    },
+    {
+      "name": "expression-is-not-action",
+      "files": {
+        "run.log": "The coverage statistics at 2026-01-01 00:00:00\nline 3, col 1 to line 3, col 4 of module Model: 2:10\nEnd of statistics.\nModel checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "Step\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT COVERAGE_MISSING states=5 queue=0\n"
+    },
+    {
+      "name": "last-coverage-zero",
+      "files": {
+        "run.log": "The coverage statistics at 2026-01-01 00:00:00\n<Step line 3, col 1 to line 3, col 4 of module Model>: 2:10\nEnd of statistics.\nThe coverage statistics at 2026-01-01 00:00:00\n<Step line 3, col 1 to line 3, col 4 of module Model>: 0:0\nEnd of statistics.\nModel checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "Step\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT COVERAGE_MISSING states=5 queue=0\n"
+    },
+    {
+      "name": "truncated-coverage",
+      "files": {
+        "run.log": "The coverage statistics at 2026-01-01 00:00:00\n<Step line 3, col 1 to line 3, col 4 of module Model>: 2:10\nEnd of statistics.\nThe coverage statistics at 2026-01-01 00:00:00\n<Step line 3, col 1 to line 3, col 4 of module Model>: 2:10\nModel checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "Step\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT COVERAGE_MISSING states=5 queue=0\n"
+    },
+    {
+      "name": "simulate-flag",
+      "files": {
+        "run.log": "Model checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--simulate"
+      ],
+      "exit": 3,
+      "stdout": "VERDICT SAMPLED_NO_VIOLATION states=5 queue=0\n"
+    },
+    {
+      "name": "simulation-progress-finished",
+      "files": {
+        "run.log": "Running Random Simulation with seed 7 with 2 workers on 4 cores.\nComputed 2 initial states...\nProgress: 2057126 states checked.\nProgress: 6685152 states checked.\nFinished in 03min 13s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 3,
+      "stdout": "VERDICT SAMPLED_NO_VIOLATION states=NA queue=NA\n"
+    },
+    {
+      "name": "simulation-progress-unfinished",
+      "files": {
+        "run.log": "Running Random Simulation with seed 7 with 2 workers on 4 cores.\nComputed 2 initial states...\nProgress: 2057126 states checked.\nProgress: 6685152 states checked.\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT TIME_LIMIT states=NA queue=NA\n"
+    },
+    {
+      "name": "simulation-progress-after-finished",
+      "files": {
+        "run.log": "Running Random Simulation with seed 7 with 2 workers on 4 cores.\nFinished in 01s at (2026-01-01 00:00:00)\nProgress: 2057126 states checked.\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT TIME_LIMIT states=NA queue=NA\n"
+    },
+    {
+      "name": "simulation-progress-zero",
+      "files": {
+        "run.log": "Running Random Simulation with seed 7 with 2 workers on 4 cores.\nProgress: 0 states checked.\nFinished in 01s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT EMPTY states=NA queue=NA\n"
+    },
+    {
+      "name": "exhaustive-progress-is-not-a-summary",
+      "files": {
+        "run.log": "Progress: 6685152 states checked.\nFinished in 03min 13s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT TIME_LIMIT states=NA queue=NA\n"
+    },
+    {
+      "name": "simulation-banner",
+      "files": {
+        "run.log": "Running Random Simulation with seed 1.\nThe number of states generated: 20\nFinished in 1s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 3,
+      "stdout": "VERDICT SAMPLED_NO_VIOLATION states=NA queue=NA\n"
+    },
+    {
+      "name": "simulation-incomplete",
+      "files": {
+        "run.log": "Running Random Simulation with seed 1.\nThe number of states generated: 20\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--simulate"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT TIME_LIMIT states=NA queue=NA\n"
+    },
+    {
+      "name": "simulation-zero",
+      "files": {
+        "run.log": "Running Random Simulation with seed 1.\nThe number of states generated: 0\nFinished in 1s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--simulate"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT EMPTY states=NA queue=NA\n"
+    },
+    {
+      "name": "simulation-coverage-required",
+      "files": {
+        "run.log": "Running Random Simulation with seed 1.\nThe number of states generated: 20\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "Step\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--simulate",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT COVERAGE_MISSING states=NA queue=NA\n"
+    },
+    {
+      "name": "simulation-error",
+      "files": {
+        "run.log": "Running Random Simulation with seed 1.\nThe number of states generated: 20\nFinished in 1s at (2026-01-01 00:00:00)\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "1",
+        "--simulate"
+      ],
+      "exit": 1,
+      "stdout": "VERDICT ERROR states=NA queue=NA\n"
+    },
+    {
+      "name": "empty-actions",
+      "files": {
+        "run.log": "Model checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "# none\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 2,
+      "stdout": "",
+      "contains": [
+        "ERROR arguments:"
+      ]
+    },
+    {
+      "name": "bad-action",
+      "files": {
+        "run.log": "Model checking completed. No error has been found.\n10 states generated, 5 distinct states found, 0 states left on queue.\nFinished in 1s at (2026-01-01 00:00:00)\n",
+        "actions.txt": "Step 12\n"
+      },
+      "args": [
+        "--log",
+        "{tmp}/run.log",
+        "--exit-code",
+        "0",
+        "--required-actions",
+        "{tmp}/actions.txt"
+      ],
+      "exit": 2,
+      "stdout": "",
+      "contains": [
+        "ERROR arguments:"
+      ]
+    },
+    {
+      "name": "usage",
+      "args": [],
+      "exit": 2,
+      "contains": [
+        "ERROR arguments:"
+      ]
+    },
+    {
+      "name": "unreadable",
+      "args": [
+        "--log",
+        "{tmp}/missing",
+        "--exit-code",
+        "0"
+      ],
+      "exit": 2,
+      "contains": [
+        "ERROR arguments:"
+      ]
+    },
+    {
+      "name": "help",
+      "args": [
+        "--help"
+      ],
+      "exit": 0,
+      "contains": [
+        "does not run TLC",
+        "distinct:total",
+        "time-limit-hit"
+      ]
+    }
+  ]
+}

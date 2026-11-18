@@ -1,0 +1,3 @@
+unit_id	resource	subsystems	k	plane	entry_kind	tier	properties	method	budget_result	evidence_level	status	brief	owner	output_dir	batch	first_of_batch	key	evidence
+# U-001	buffer_slots	allocator;worker	2	both	external_request	tier0	C-01:Isolation:safety;C-02:Invariance:2-safety	model_check;smt	within	model only	accepted	briefs/U-001.md	worker-01	evidence/unit-01/	b1	yes	no	evidence/unit-01/HANDBACK.txt;evidence/unit-01/logs/
+# U-002	buffer_slots	allocator;worker;transfer	3	both	external_request	tier1	C-03:Conservation:safety	model_check	not_run	none	running	briefs/U-002.md	worker-02;worker-03	evidence/unit-02/	b1	no	yes	

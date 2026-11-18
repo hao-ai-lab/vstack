@@ -1,0 +1,957 @@
+{
+  "script": "check_agreement.py",
+  "cases": [
+    {
+      "name": "baseline",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "verdicts-pass-pass",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "inconsistent-pass-pass",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tnot_run\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "agreement must be"
+      ]
+    },
+    {
+      "name": "verdicts-pass-violation",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tviolation\tC1\t1-20\t0\tcode_only_detects\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "inconsistent-pass-violation",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tviolation\tC1\t1-20\t0\tagree\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "agreement must be"
+      ]
+    },
+    {
+      "name": "verdicts-pass-not_run",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tnot_run\tn/a\t1-20\t0\tnot_run\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "inconsistent-pass-not_run",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tnot_run\tn/a\t1-20\t0\tagree\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "agreement must be"
+      ]
+    },
+    {
+      "name": "verdicts-violation-pass",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tviolation\tC1\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tmodel_only_detects\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "inconsistent-violation-pass",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tviolation\tC1\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "agreement must be"
+      ]
+    },
+    {
+      "name": "verdicts-violation-violation",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tviolation\tC1\tmodel.log\tn/a\tstateful_test\tviolation\tC1\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "inconsistent-violation-violation",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tviolation\tC1\tmodel.log\tn/a\tstateful_test\tviolation\tC1\t1-20\t0\tnot_run\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "agreement must be"
+      ]
+    },
+    {
+      "name": "verdicts-violation-not_run",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tviolation\tC1\tmodel.log\tn/a\tstateful_test\tnot_run\tn/a\t1-20\t0\tnot_run\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "inconsistent-violation-not_run",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tviolation\tC1\tmodel.log\tn/a\tstateful_test\tnot_run\tn/a\t1-20\t0\tagree\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "agreement must be"
+      ]
+    },
+    {
+      "name": "verdicts-not_run-pass",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tnot_run\tn/a\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tnot_run\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "inconsistent-not_run-pass",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tnot_run\tn/a\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "agreement must be"
+      ]
+    },
+    {
+      "name": "verdicts-not_run-violation",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tnot_run\tn/a\tmodel.log\tn/a\tstateful_test\tviolation\tC1\t1-20\t0\tnot_run\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "inconsistent-not_run-violation",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tnot_run\tn/a\tmodel.log\tn/a\tstateful_test\tviolation\tC1\t1-20\t0\tagree\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "agreement must be"
+      ]
+    },
+    {
+      "name": "verdicts-not_run-not_run",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tnot_run\tn/a\tmodel.log\tn/a\tstateful_test\tnot_run\tn/a\t1-20\t0\tnot_run\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "inconsistent-not_run-not_run",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tnot_run\tn/a\tmodel.log\tn/a\tstateful_test\tnot_run\tn/a\t1-20\t0\tagree\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "agreement must be"
+      ]
+    },
+    {
+      "name": "model-only",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tnone\tnot_run\tn/a\t1-20\t0\tnot_run\tRequired hardware unavailable\tmodel only\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "baseline-and-control",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tpin-fixed\tcontrol\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\ttrace\tpass\tnone\t1-20\t0\tagree\t\treal engine\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "baseline-and-mutant",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=2\tpin\tC1\tviolation\tC1\tmodel.log\tyes\ttrace\tviolation\tC1\t1-20\t200\tagree\t\treal engine\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "enum-kind",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tinvalid\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "invalid kind"
+      ]
+    },
+    {
+      "name": "enum-model_verdict",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tinvalid\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "invalid model_verdict"
+      ]
+    },
+    {
+      "name": "enum-mutation_reached",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tinvalid\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "invalid mutation_reached"
+      ]
+    },
+    {
+      "name": "enum-real_code_method",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tinvalid\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "invalid real_code_method"
+      ]
+    },
+    {
+      "name": "enum-real_code_verdict",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tinvalid\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "invalid real_code_verdict"
+      ]
+    },
+    {
+      "name": "enum-agreement",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tinvalid\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "invalid agreement"
+      ]
+    },
+    {
+      "name": "enum-evidence_level",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tinvalid\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "invalid evidence_level"
+      ]
+    },
+    {
+      "name": "unresolved",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tviolation\tC1\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tmodel_only_detects\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "requires resolution"
+      ]
+    },
+    {
+      "name": "none-with-real-level",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tnone\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "method none requires"
+      ]
+    },
+    {
+      "name": "real-with-model-level",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tmodel only\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "cannot have"
+      ]
+    },
+    {
+      "name": "no-baseline",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tMutDropGuard\tmutant\tslots=2\tpin\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t7\tagree\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "no baseline row"
+      ]
+    },
+    {
+      "name": "missing-unit-baseline",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nanother-unit\tMutDropGuard\tmutant\tslots=2\tpin\tC1\tviolation\tC1\tmodel.log\tyes\tstateful_test\tviolation\tC1\t1-20\t7\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "unit 'another-unit' has no baseline row"
+      ]
+    },
+    {
+      "name": "empty",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\n\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "no baseline row"
+      ]
+    },
+    {
+      "name": "bad-header",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\textra\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "header must be"
+      ]
+    },
+    {
+      "name": "old-header",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tmodel_verdict\tmodel_evidence\treal_code_method\treal_code_verdict\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "header must be"
+      ]
+    },
+    {
+      "name": "short-row",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "expected 18 columns"
+      ]
+    },
+    {
+      "name": "comments",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\n# example\n\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "unreadable",
+      "args": [
+        "{tmp}/missing"
+      ],
+      "exit": 1,
+      "contains": [
+        "ERROR "
+      ]
+    },
+    {
+      "name": "usage",
+      "args": [],
+      "exit": 2,
+      "contains": [
+        "ERROR arguments:"
+      ]
+    },
+    {
+      "name": "help",
+      "args": [
+        "--help"
+      ],
+      "exit": 0,
+      "contains": [
+        "mutant inventory",
+        "Read-only",
+        "same clauses"
+      ]
+    },
+    {
+      "name": "mutant-undetected",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=2\tpin\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "mutant detected by neither model nor real code"
+      ]
+    },
+    {
+      "name": "mutant-undetected-with-resolution",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=2\tpin\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\tmutant removes a guard that no reachable path needs at this pin; see the unit record\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "clause-mismatch-as-agree",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1;C2\tviolation\tC1\tmodel.log\tn/a\tstateful_test\tviolation\tC2\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "agreement must be clause_mismatch",
+        "different clauses"
+      ]
+    },
+    {
+      "name": "clause-mismatch-recorded",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1;C2\tviolation\tC1\tmodel.log\tn/a\tstateful_test\tviolation\tC2\t1-20\t0\tclause_mismatch\tsplit into one row per clause; the model stops at C1 and the code at C2\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "clause-mismatch-unresolved",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1;C2\tviolation\tC1\tmodel.log\tn/a\tstateful_test\tviolation\tC2\t1-20\t0\tclause_mismatch\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "requires resolution"
+      ]
+    },
+    {
+      "name": "clause-subset-as-agree",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1;C2\tviolation\tC1;C2\tmodel.log\tn/a\tstateful_test\tviolation\tC1\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "agreement must be clause_mismatch"
+      ]
+    },
+    {
+      "name": "clause-same-set-other-order",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1;C2\tviolation\tC1;C2\tmodel.log\tn/a\tstateful_test\tviolation\tC2; C1\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "violated-missing",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tviolation\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tmodel_only_detects\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "model_violated must name the violated clauses"
+      ]
+    },
+    {
+      "name": "violated-outside",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tviolation\tC3\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tmodel_only_detects\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "names clauses outside clauses: C3"
+      ]
+    },
+    {
+      "name": "pass-with-violated",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tC1\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "code_violated must be none"
+      ]
+    },
+    {
+      "name": "not-run-with-list",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tnot_run\tnone\t1-20\t0\tnot_run\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "code_violated must be n/a"
+      ]
+    },
+    {
+      "name": "repeated-clause",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1;C1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "distinct ids"
+      ]
+    },
+    {
+      "name": "empty-clauses",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\t\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "distinct ids"
+      ]
+    },
+    {
+      "name": "free-text-scale",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\ttwo slots\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "scale must list"
+      ]
+    },
+    {
+      "name": "duplicate-row",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "duplicate row"
+      ]
+    },
+    {
+      "name": "same-config-two-scales",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tpin\tbaseline\tslots=3\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "mutant-masked",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tviolation\tC1\tmodel.log\tn/a\tstateful_test\tviolation\tC1\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=2\tpin\tC1\tviolation\tC1\tmodel.log\tyes\tstateful_test\tviolation\tC1\t1-20\t7\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "model violation is masked",
+        "code violation is masked"
+      ]
+    },
+    {
+      "name": "mutant-on-repaired-control",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tviolation\tC1\tmodel.log\tn/a\tstateful_test\tviolation\tC1\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tpin-fixed\tcontrol\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=2\tpin-fixed\tC1\tviolation\tC1\tmodel.log\tyes\tstateful_test\tviolation\tC1\t1-20\t7\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "mutant-base-not-run",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tpin-fixed\tcontrol\tslots=2\tn/a\tC1\tnot_run\tn/a\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tnot_run\tDirected check and triage recorded\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=2\tpin-fixed\tC1\tviolation\tC1\tmodel.log\tyes\tstateful_test\tviolation\tC1\t1-20\t7\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "model violation is masked"
+      ]
+    },
+    {
+      "name": "mutant-code-masked",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tviolation\tC1\t1-20\t0\tcode_only_detects\tDirected check and triage recorded\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=2\tpin\tC1\tpass\tnone\tmodel.log\tyes\tstateful_test\tviolation\tC1\t1-20\t7\tcode_only_detects\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "code violation is masked"
+      ]
+    },
+    {
+      "name": "mutant-unreached",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=2\tpin\tC1\tviolation\tC1\tmodel.log\tno\tstateful_test\tviolation\tC1\t1-20\t7\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "mutation_reached is 'no'"
+      ]
+    },
+    {
+      "name": "mutant-reached-not-stated",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=2\tpin\tC1\tviolation\tC1\tmodel.log\tn/a\tstateful_test\tviolation\tC1\t1-20\t7\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "mutation_reached is 'n/a'"
+      ]
+    },
+    {
+      "name": "mutant-undetected-reached",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=2\tpin\tC1\tpass\tnone\tmodel.log\tyes\tstateful_test\tpass\tnone\t1-20\t0\tagree\tDirected check and triage recorded\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "mutation_reached must be n/a when neither side"
+      ]
+    },
+    {
+      "name": "mutant-no-base",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=2\tmissing\tC1\tviolation\tC1\tmodel.log\tyes\tstateful_test\tviolation\tC1\t1-20\t7\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "names no baseline or control row"
+      ]
+    },
+    {
+      "name": "mutant-base-other-scale",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=3\tpin\tC1\tviolation\tC1\tmodel.log\tyes\tstateful_test\tviolation\tC1\t1-20\t7\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "names no baseline or control row"
+      ]
+    },
+    {
+      "name": "mutant-scale-order",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2;requests=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\trequests=2; slots=2\tpin\tC1\tviolation\tC1\tmodel.log\tyes\tstateful_test\tviolation\tC1\t1-20\t7\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    },
+    {
+      "name": "mutant-base-is-mutant",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=2\tpin\tC1\tviolation\tC1\tmodel.log\tyes\tstateful_test\tviolation\tC1\t1-20\t7\tagree\t\tCPU replay of real code\nqueue\tMutSecond\tmutant\tslots=2\tMutDropGuard\tC1\tviolation\tC1\tmodel.log\tyes\tstateful_test\tviolation\tC1\t1-20\t7\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "names no baseline or control row"
+      ]
+    },
+    {
+      "name": "mutant-without-base",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=2\tn/a\tC1\tviolation\tC1\tmodel.log\tyes\tstateful_test\tviolation\tC1\t1-20\t7\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "a mutant names in mutant_of"
+      ]
+    },
+    {
+      "name": "baseline-with-mutant-of",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tpin\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "mutant_of must be n/a"
+      ]
+    },
+    {
+      "name": "baseline-with-reached",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tyes\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "mutation_reached must be n/a for baseline"
+      ]
+    },
+    {
+      "name": "mutant-base-unchecked-clause",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=2\tpin\tC1;C2\tviolation\tC2\tmodel.log\tyes\tstateful_test\tviolation\tC2\t1-20\t7\tagree\t\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 1,
+      "contains": [
+        "did not check C2"
+      ]
+    },
+    {
+      "name": "mutant-model-only-detects",
+      "files": {
+        "input.tsv": "unit\tconfig_or_mutant\tkind\tscale\tmutant_of\tclauses\tmodel_verdict\tmodel_violated\tmodel_evidence\tmutation_reached\treal_code_method\treal_code_verdict\tcode_violated\tseeds_or_traces\thits\tagreement\tresolution\tevidence_level\nqueue\tpin\tbaseline\tslots=2\tn/a\tC1\tpass\tnone\tmodel.log\tn/a\tstateful_test\tpass\tnone\t1-20\t0\tagree\t\tCPU replay of real code\nqueue\tMutDropGuard\tmutant\tslots=2\tpin\tC1\tviolation\tC1\tmodel.log\tyes\tstateful_test\tpass\tnone\t1-20\t7\tmodel_only_detects\tdirected real-code check scheduled from the counterexample\tCPU replay of real code\n"
+      },
+      "args": [
+        "{tmp}/input.tsv"
+      ],
+      "exit": 0,
+      "contains": [
+        "OK agreement:"
+      ]
+    }
+  ]
+}

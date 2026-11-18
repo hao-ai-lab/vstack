@@ -1,0 +1,18 @@
+The census is complete: two writers, both guarded.
+
+BEGIN HANDBACK
+verdict: PASS
+check: python3 /opt/verify/tools/check_writers.py {tmp}/out/WRITERS.tsv
+log: {tmp}/out/logs/writers.log
+last line: OK writers: 0 errors
+check: bash /opt/verify/tools/cites.sh {tmp}/out
+log: out/logs/cites.log
+last line: cites checked: 4, errors=0
+version: python3 3.12
+version: source abc1234
+written: {tmp}/out/WRITERS.tsv
+written: {tmp}/out/logs
+rules broken: none
+END HANDBACK
+
+Questions for the coordinator: none.

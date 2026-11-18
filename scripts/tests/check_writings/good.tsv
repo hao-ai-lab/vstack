@@ -1,0 +1,7 @@
+row_a	row_b	relation	contradiction	who_is_right	note
+A-01	B-01	same	no		
+A-02	B-02	narrower	no		B also covers the pending transfer
+A-02	B-05	overlap	no		B splits the worker write into two sites
+A-03	B-03	same	yes	b	src/transfer.py:77 rejects a stale generation
+A-04		only_here	no		
+	B-04	only_here	no		

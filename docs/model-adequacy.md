@@ -13,17 +13,40 @@ Terms defined elsewhere: [Gate 1a and 1b](exposure-gate.md#gate-1-formal-exposur
 
 | Track | Always required | Readout |
 | :--- | :--- | :--- |
-| [`hunt-system-bugs`](../skills/vstack-mode/playbooks/hunt-system-bugs.md) | The [exposure gate](exposure-gate.md), [`InputEnabled_<E>`](../skills/vstack-s3-model/SKILL.md#open-environment) invariants and `W_*` witnesses | Readout 1, where `TAR` may be `N/A (no trace harness)`. No historical denominator, no blind matrix. |
+| [`hunt-system-bugs`](../skills/vstack-mode/playbooks/hunt-system-bugs.md) | The [exposure gate](exposure-gate.md), [`InputEnabled_<E>`](../skills/vstack-s3-model/SKILL.md#open-environment) invariants, `W_*` witnesses, the [anchor map](#anchor-map) and an [agreement record](../templates/agreement.tsv) | Readout 1; `TAR = N/A` only with the `model only` label. No historical denominator, no blind matrix. |
 | [`full-verification`](../skills/vstack-mode/playbooks/full-verification.md), [S8](../skills/vstack-s8-package-maintain/SKILL.md) regression skills, benchmark evaluations | Everything the hunt track requires | All three readouts. |
 
-A model reported with `TAR = N/A` supports findings, not a high-assurance claim.
+A model reported with `TAR = N/A` supports only findings labeled `model only`, not a high-assurance claim.
 
 ## Readout 1: trace and baseline agreement
 
+Both tracks owe [agreement.tsv](../templates/agreement.tsv): one row for the unmutated pinned baseline and one
+for each calibration mutant, recording model and real-code verdicts. The real-code side is either S4 step 3
+trace conformance or a stateful randomized test of real code asserting the frozen property clauses after each
+step. For the latter, report seed and hit counts in place of `TAR`. If neither method can run on the available
+hardware, set `real_code_method = none`, explain why in `resolution`, and label every pass and finding of the
+unit `model only`; only with that label may `TAR = N/A` be used. Other rows use the applicable
+[evidence level](exposure-gate.md#gate-3-real-engine). [S4](../skills/vstack-s4-calibrate-tv/SKILL.md) owns mismatch
+resolution before S6 counts results. [check_agreement.py](../scripts/check_agreement.py) checks record syntax
+and consistency mechanically; it cannot validate verdicts, resolution adequacy, the mutant inventory or whether
+`mutation_reached` is true.
+
+Compare per property clause, not per configuration. Each row lists in `clauses` the clauses both sides checked
+and, for each side, the clauses it violated (`model_violated`, `code_violated`). Two violations agree only when
+they are of the same clauses: a model that breaks C1 and code that breaks C2 do not confirm each other, and the
+checker requires `clause_mismatch` with a resolution, best a split into one row per clause. Rows carry the run's
+`scale` (its constants), and a mutant row names in `mutant_of` the unmutated baseline or control row it modifies, at
+the same scale. A mutant's violation calibrates only when that unmutated row passes on the same side at that scale
+and checked the violated clauses, and every violating run passes through the mutated action or code
+(`mutation_reached = yes`, read from the counterexample trace or the run's coverage). Otherwise an existing defect
+can produce the violation and hide the mutant. When the pinned baseline already violates, add a `control` row with
+the known repairs switched on and apply the mutants to it. The real-code test follows the
+[rules for clause checks](contracts.md#checks-derived-from-a-clause).
+
 - **Trace acceptance rate** `TAR = M_consumed / M_traces`: real traces that some model execution consumes completely
   (existential completion in [trace conformance](trace-validation.md)), over the traces offered. CPU replay traces of
-  real code and real-engine traces both count; state which. Without traces, write `TAR = N/A`; never count `0/0` as
-  100%.
+  real code and real-engine traces both count; state which. Without traces, use the stateful-test readout or the
+  labeled model-only exception above; never count `0/0` as 100%.
 - **Negative-mutant rejection rate**, required wherever `TAR` is reported: the fraction of paired negative mutants (a
   tampered trace or a weakened guard) that the model rejects. Trace acceptance is existential: a wider model accepts
   more, so deleting a guard never lowers `TAR`. Only the rejection rate exposes that.
@@ -88,8 +111,14 @@ otherwise label `BDR_revert` possibly contaminated. Synthetic mutants do not hav
 
 ### Anchor map
 
-S3 writes each guard and state update it actually models as a named operator used by its actions (`G_A12 == ...`,
-`U_A13(x) == ...`) and lists each in `ANCHORS.tsv`. Code the model leaves out needs no row.
+On both tracks, including hunt, S3 writes each guard and state update it models as a named operator used by its
+actions (`G_A12 == ...`, `U_A13(x) == ...`) and lists each in `ANCHORS.tsv`. Alongside that operator map, keep the
+reverse writer table [anchors.tsv](../templates/anchors.tsv): every write site of in-scope state is `modeled`,
+`assumed_env` or `out_of_scope`, with an operator for modeled rows and a reason otherwise. Hold and read rows
+may record other citations. [check_anchors.py](../scripts/check_anchors.py) checks source lines and quoted code;
+with `--fields` and `--paths` it also lists uncovered Python attribute writes. Its scan is a lower bound, not
+proof of completeness; other languages and unsupported writes need manual review. Pin the source snapshot
+independently: the checker does not verify the commit suffix against Git. The operator map retains this format:
 
 ```text
 file    line_start-line_end    commit    kind (guard | update | order)    operator

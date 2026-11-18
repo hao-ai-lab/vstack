@@ -4,6 +4,10 @@ The plugin layout follows Lauren Tan's [pstack](https://github.com/cursor/plugin
 
 The source repository's `NOTICE.md` records earlier adaptations from pstack at revision `ae5650f`: working principles, case framing, run review, red-team review, handoff, regression-skill templates and maintenance. Their generalized adaptations are retained here. The scope-audit concept also derives from that workflow. No pstack asset or full skill corpus is copied.
 
+The coordination layer of release 0.123.0 adapts pstack 0.15.42: the orchestrate playbook of poteto-mode (one owner per unit, a fresh worker per task, a kickoff that names the evidence of done, reading artifacts rather than summaries, and starting with one unit before fanning out), swarm (a result that does not record what its brief asked for is sent back, then recorded as a gap), arena (the same brief to independent candidates, then a base picked and the others grafted by hand), and reflect and correct (a review after each batch, an enforcer at the highest level that works for an error seen twice, and a table pairing each rule with its enforcer). Arena's cross-judge from another model family is not adopted. The task brief template, the hand-back block and the five checks are new code.
+
+Release 0.124.0 applies pstack's correct and encode-lessons-in-structure rules (an error seen twice becomes a check that refuses, registered with its enforcer), build-the-lever (a generator instead of hand-edited briefs), prove-it-works (each new check is tested on the failure it was written for) and make-operations-idempotent (regenerating a brief gives the same file) to failures recorded while the coordination layer was used. The brief generator, the domain brief templates and the new rules of the brief and hand-back checks are new code.
+
 The following upstream notice applies to the adapted pstack portions. The package license is in `LICENSE`.
 
 

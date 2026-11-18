@@ -4,6 +4,8 @@
 
 - Falsifiable completion predicate: <...>.
 - Covered files/functions and pinned revision: <...>.
+- Unit ([unit table](unit-table.tsv)): resource, subsystems, `k`, plane, `entry_kind`, deployment `tier`: <...>.
+- Search budget and result ([run order and budget](../docs/run-review.md#run-order-and-budget)): limits, smallest scale reaching the concurrency witness, evidence paths, `within` / `over_budget` / `not_run`: <...>.
 - State, actors, faults, domains and known calibration bugs: <...>.
 - Assurance tier and why it fits consequences/scale/ownership: <...>.
 - Stage route and any allowed omissions: <...>.
