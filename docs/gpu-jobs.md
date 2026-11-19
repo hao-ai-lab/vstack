@@ -39,7 +39,8 @@ agreement with the other team; put its cap in `--max-limit-s` and its name prefi
 
 Fields: `job` (the queue file name stem; with `--mine`, it must start with our prefix), and per run `name`, `gpu`
 (one physical index), `cpus` (a CPU list such as `0-3` or `4,5`), `limit_s`, `cmd` (an absolute program path and
-its arguments), optionally `lock` (an absolute path) and `nice` (0 to 19). Each run sees `CUDA_VISIBLE_DEVICES` set
+its arguments), optionally `lock` (an absolute path; `null` means none) and `nice` (0 to 19). A CPU range runs
+upwards (`3-1` is refused), and `PACK.json` is not a run name, because the job summary uses it. Each run sees `CUDA_VISIBLE_DEVICES` set
 to its GPU, `VSTACK_RUN_CPUS` and `OMP_NUM_THREADS` for its CPUs, and starts in its own directory
 `OUT/NAME/` with its log in `run.log`.
 
@@ -56,7 +57,11 @@ python3 scripts/gpu_pack.py run JOB.json --out OUT_DIR --claim CLAIM_DIR --mine 
 ends with `OK pack: ...` or `FAIL pack: ...`; `OUT_DIR/PACK.json` and `OUT_DIR/NAME/result.json` hold the same
 facts. A queue that loses the claim prints `SKIP pack: ... already ran` and exits 0. A claim that is held without
 a done record (its run died) exits 3 and is left for a person to inspect, so a job is never run twice by accident.
-Use the same `CLAIM_DIR` in every queue the job is offered to, and a fresh one for every new job.
+Use the same `CLAIM_DIR` in every queue the job is offered to, and a fresh one for every new job. A queue whose
+`OUT_DIR` already exists is refused before it takes the claim, so another queue can still run the job. Runs that
+share a lock wait for each other without a deadline of their own; a run gives up with `lock_timeout` only when
+the lock is held outside the job for its whole cap. A run whose program cannot start fails with `start_error`
+and the other runs go on; an unexpected error stops every run and still writes `PACK.json` and the done record.
 
 Limits: GPU memory is read with `nvidia-smi` (`--smi` names another program, as the tests do); a process that
 leaves its run's process group (a double fork into a new session) is not stopped, but the GPU check still fails

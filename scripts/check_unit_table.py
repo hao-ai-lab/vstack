@@ -30,9 +30,15 @@ def data_lines(path):
 def read_plan(path):
     """One unit id per line, or a TSV whose header has a unit_id column."""
     rows = list(data_lines(path))
-    if rows and "\t" in rows[0][1] and "unit_id" in rows[0][1].split("\t"):
-        column = rows[0][1].split("\t").index("unit_id")
-        return [line.split("\t")[column].strip() for _, line in rows[1:] if len(line.split("\t")) > column]
+    header = [cell.strip() for cell in rows[0][1].split("\t")] if rows else []
+    if "unit_id" in header:  # a TSV plan, also one of a single column
+        column, ids = header.index("unit_id"), []
+        for no, line in rows[1:]:
+            cells = line.split("\t")
+            if len(cells) <= column or not cells[column].strip():
+                raise ValueError(f"{path}:{no}: no unit_id in this plan row")
+            ids.append(cells[column].strip())
+        return ids
     return [line.strip() for _, line in rows]
 
 
@@ -50,9 +56,11 @@ def main():
         + ", ".join(STATUSES) + ". Every row needs a unique unit_id, a batch, yes/no in first_of_batch and key, "
         "and its own output_dir (unique, not nested in another). Past running (pass, issues, blocked, accepted) "
         "a row needs an owner and evidence: ;-separated paths that exist inside its output_dir; a key unit past "
-        "running names two owners (a;b) and, unless blocked, a writing-compare table among its evidence. Each "
+        "running names two owners (a;b) and, unless blocked, a writing-compare table among its evidence; a unit "
+        "that is not key names one owner. Each "
         "batch has exactly one first unit, and no other unit of the batch leaves queued before the first is "
-        "accepted. --plan lists the planned unit ids; a planned unit missing from the table or a unit absent "
+        "accepted. --plan lists the planned unit ids (one per line, or a TSV with a unit_id column, also of one "
+        "column); a planned unit missing from the table or a unit absent "
         "from the plan fails. --final also fails on any unit not accepted or blocked; blocked rows are reported "
         "as gaps. Dispatch: brief is the brief the unit's worker was sent and owner the id of that worker (the "
         "id the harness gave the sub-agent, not a role or slot name). A unit past queued needs a brief that "
@@ -78,7 +86,7 @@ def main():
     try:
         lines = list(data_lines(args.table))
         planned = read_plan(args.plan) if args.plan else None
-    except (OSError, UnicodeError) as exc:
+    except (OSError, UnicodeError, ValueError) as exc:
         print(f"ERROR {getattr(exc, 'filename', None) or args.table}: {exc}\nFAIL unit table: 1 errors")
         return 1
     if not lines or lines[0][1].split("\t") != HEADER:
@@ -139,6 +147,8 @@ def main():
             error(no, f"a {status} unit needs the brief its worker was sent (column brief)")
         if row["key"] == "yes" and status in PAST_RUNNING and len(set(owners)) != 2:
             error(no, "a key unit is written twice: owner must name two different workers (a;b)")
+        elif row["key"] != "yes" and len(owners) > 1:
+            error(no, "a unit that is not key has one worker: owner names one id (only key units name a;b)")
         if not row["output_dir"]:
             error(no, "output_dir is required")
             continue

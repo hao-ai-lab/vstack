@@ -116,7 +116,15 @@ def main():
             'unmapped-table': (change(GOOD[0], table='units'), 'no --table for units'),
             'beyond-file': (change(GOOD[0], evidence='engine/shm.py:90 the ring'), 'beyond its 45 lines'),
             'absent-file': (change(GOOD[0], evidence='engine/ring.py:4 the ring'), 'is not a file under'),
+            # Inputs of an outside review of 0.125.0 that passed before 0.126.0.
+            'missed-write-removed': (change(GOOD[2], right_value='(removed)'), 'missed_write: field row'),
+            'reversed-range': (change(GOOD[0], evidence='engine/shm.py:44-1 the ring'), 'beyond its 45 lines'),
+            'start-beyond-file': (change(GOOD[0], evidence='engine/shm.py:99-1 the ring'), 'beyond its 45 lines'),
+            'outside-source': (change(GOOD[0], evidence='../outside.py:1 the ring'), 'is not a file under'),
+            'absolute-outside-source': (change(GOOD[0], evidence=f'{scratch}/outside.py:1 the ring'),
+                                        'is not a file under'),
         }
+        (scratch / 'outside.py').write_text('line 1\n')
         for name, (row, fragment) in bad.items():
             invoke(record(scratch / 'one.tsv', [row]), *table, '--source', source, code=1, contains=(fragment,),
                    label=name)

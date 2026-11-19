@@ -4,6 +4,49 @@ Releases of the vstack toolkit: skills, templates, documents and scripts. The ve
 five manifests (`plugin.json`, `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`,
 `.cursor-plugin/plugin.json`, `pyproject.toml`).
 
+## 0.126.0
+
+The checks refuse what their documents say they refuse. Each claim of an outside review of 0.125.0 was run against
+the released scripts first; every fix below comes with a self-test that failed on 0.125.0.
+
+- `scripts/grade_findings.py`: the service-ending phrase list also reads a killed worker, an engine-dead error, new
+  requests refused or failing without an auxiliary verb, and other requests failing, and ignores a negated phrase; a
+  marker or class with no text after it (`availability: error:`, `error:`) is refused; a `test_only` record needs
+  `entrypoint` `n/a`; an `unknown` grade is compared with listed ambiguous readings by the lowest grade its facts
+  allow; a cell that starts with a quote but is not wholly quoted is read as written instead of refused.
+- `scripts/check_hygiene.py`: file names are checked for `--deny` terms and bytes that are not UTF-8; personal paths
+  without a trailing slash and Windows profiles with forward slashes are reported; decomposed Hangul jamo count as
+  CJK; `--walk` scans a link to a directory as a link.
+- `scripts/check_brief.py`: a stamp line with text after its comment is no stamp; patterns are tested against sample
+  `FAIL` and `ERROR` lines; `**/` matches zero directories; `<name:value>` is a placeholder (only URL and e-mail
+  autolinks in prose pass); ids are checked on `literal:` and `ref:` lines; blind paths are checked against every
+  other line, with `:` ending a path and `..` resolved; an `except` glob under a writable glob is accepted;
+  ``1 row of `FILE` `` is recounted.
+- `scripts/make_brief.py`: a brief made with `--template` is checked against that template's sections; a slot name
+  may be one letter.
+- `scripts/parse_handback.py`: a changed file two sibling briefs may write is refused; a `--changed` line that reads
+  both as a status line and as an existing path is refused as ambiguous; an invalid pattern in the brief is an error,
+  not a crash; a relative `--ref` table resolves against `--root`.
+- `scripts/refuse_inline_python.py` reads a command with the shell's quoting rules (quotes, comments, line
+  continuations, descriptor numbers before redirections, here-documents with quoted or escaped delimiters, nested
+  substitutions) and also refuses `python3 -- -`, a program read from a file descriptor, `env -S` in option
+  clusters and with arguments after it, `uv` global options before `run`, `bash --rcfile FILE -c`, `eval --`,
+  `flock FILE -c` and `coproc`. `python3 <<EOF script.py` and here-documents that no shell reads pass. What text
+  reading cannot close is stated as a limit in its help and in [the inline Python hook](docs/gates.md#inline-python-hook).
+- `scripts/gpu_pack.py`: a reversed CPU range and the run name `PACK.json` are refused; a `null` lock is no lock; runs
+  that share a lock wait for each other instead of for the job's start; a run whose program cannot start fails alone
+  and an unexpected error stops every run and still writes `PACK.json` and the done record; an existing output
+  directory is refused before the claim is taken.
+- `scripts/check_unit_table.py`: a one-column TSV plan is read as a plan and a short plan row is an error; a unit that
+  is not key names one owner.
+- `scripts/check_census_fixes.py`: a `missed_write` cannot have the right value `(removed)`; cited lines must lie in
+  a file inside `--source`, the range running upwards.
+- `scripts/scope_check.py --all` checks both paths of a rename; `scripts/check_names.py` keeps identifiers after a
+  `//` inside a C-like string literal and leaves out docstrings of one word; `vstack gate tlc-verdict LOG RC` prints
+  the label instead of running a file that only defines functions.
+- New self-tests for `scope_check.py` and `vstack_cli.py`; `docs/danger-grading.md`, `docs/gates.md`,
+  `docs/gpu-jobs.md` and `docs/rule-registry.md` follow.
+
 ## 0.125.0
 
 Findings that end the service route to the private channel by rule.

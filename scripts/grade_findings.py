@@ -55,6 +55,8 @@ CROSS_REQUEST_MARK = "cross_request_data:"
 AVAILABILITY_MARK = "availability:"
 PRIVATE_MARKS = (CROSS_REQUEST_MARK, AVAILABILITY_MARK)
 _NOT_TO = r"(?!\s+to\b)"  # "fails to free" names a leak or a slow path, not a failed request
+_WORDS = r"(?:(?!(?:not|never|no)\b)[\w-]+ ){0,6}?"  # up to six words between, none a negation
+_SPAN = r"(?:(?!\b(?:not|never|no)\b)[^.;:]){{0,{}}}?"  # a short stretch of one clause without a negation
 # Phrases that state a service-ending effect; an impact naming one must carry the availability marker. The list
 # reads words, not causes, and errs toward the marker, whose route is the safe one.
 SERVICE_ENDING = (
@@ -63,16 +65,18 @@ SERVICE_ENDING = (
         r" (?:exits|exited|dies|died|crashes|crashed|terminates|terminated|stops serving|goes down|went down)\b"
         r"|\bexits the (?:server|process)\b"
         r"|\b(?:ends|ended|kills|killed|crashes|crashed|takes down|took down|brings down|brought down)"
-        r" the (?:whole |entire )?(?:api[- ]?server|server|scheduler|engine[- ]?core|engine)(?: process)?\b"
+        r" the (?:whole |entire )?(?:api[- ]?server|server|scheduler|engine[- ]?core|engine|worker)(?: process)?\b"
         r"(?! (?:step|loop|request|call)s?\b)"
-        r"|\bENGINE_(?:CORE_)?DEAD\b|\bEngineDeadError\b", re.I)),
+        r"|\bENGINE_(?:CORE_)?DEAD\b|\bEngineDeadError\b|\bengine[- ](?:core[- ])?dead\b(?!-)", re.I)),
     ("refused new requests", re.compile(
         r"\brefus(?:es|ed|ing)? (?:every |all |any )?(?:new|later|further|subsequent) requests?\b"
-        r"|\b(?:new|later|further|subsequent) requests? (?:[\w-]+ ){0,6}?(?:are|were|is|get|got) (?:refused|rejected)\b"
-        r"|\b(?:new|later|further|subsequent) requests? (?:[\w-]+ ){0,6}?fail(?:s|ed)?\b" + _NOT_TO, re.I)),
+        r"|\b(?:new|later|further|subsequent) requests? (?:are |were |is |get |got |being )?(?:refused|rejected)\b"
+        r"|\b(?:new|later|further|subsequent) requests? " + _WORDS + r"(?:are|were|is|get|got) (?:refused|rejected)\b"
+        r"|\b(?:new|later|further|subsequent) requests? " + _WORDS + r"fail(?:s|ed|ing)?\b" + _NOT_TO, re.I)),
     ("failure of other in-flight requests", re.compile(
         r"\b(?:every|all)\b[^.;:]{0,40}?\brequests?\b[^.;:]{0,60}?\bfail(?:s|ed|ing)?\b" + _NOT_TO
-        + r"|\bdenial of service\b", re.I)),
+        + r"|\bother\b" + _SPAN.format(30) + r"\brequests?\b" + _SPAN.format(60) + r"\bfail(?:s|ed|ing)?\b"
+        + _NOT_TO + r"|\bdenial of service\b", re.I)),
 )
 # Words that stand in for a command nobody established; `unknown` alone is the sanctioned value.
 PLACEHOLDERS = {"n/a", "na", "none", "tbd", "todo", "default", "same", "-", "?", "...", UNKNOWN}
@@ -81,6 +85,7 @@ OPTION = re.compile(r"--[A-Za-z0-9][A-Za-z0-9_-]*(?:=.*)?", re.S)
 UNSIGNED = re.compile(r"[0-9]+")
 RATIO = re.compile(r"([0-9]+)/([0-9]+)")
 TOKEN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:@/+-]*")
+QUOTED_CELL = re.compile(r'"((?:[^"]|"")*)"(?=\t|\Z)')
 FORMATS = {
     "finding_id": (TOKEN, "an identifier without spaces"),
     "unit": (TOKEN, "an identifier without spaces"),
@@ -180,10 +185,11 @@ def service_ending(impact: str) -> tuple[str, str] | None:
     return None
 
 
-def consequence_class(impact: str) -> str | None:
-    """The leading not-serious class of `impact` (after optional private-routing markers), or None."""
+def consequence_class(impact: str) -> tuple[str | None, str]:
+    """The leading not-serious class of `impact` (after optional private-routing markers) or None, and the text
+    after the class."""
     head, colon, rest = split_marks(impact)[1].partition(":")
-    return head if colon and head in NOT_SERIOUS and rest.strip() else None
+    return (head, rest.strip()) if colon and head in NOT_SERIOUS else (None, "")
 
 
 def has_unknown_fact(row: dict[str, str]) -> bool:
@@ -227,6 +233,23 @@ def derive(row: dict[str, str], count: int | None) -> tuple[str, str]:
     return tier, options.pop() if len(options) == 1 else UNKNOWN
 
 
+def lowest_rank(row: dict[str, str], count: int | None) -> int | None:
+    """The lowest grade rank the facts allow: the grade itself when it is known, else the lowest grade any value of
+    the unknown facts gives (an unknown precondition may also make external traffic an internal control); None for
+    a finding without a grade."""
+    tier, grade = derive(row, count)
+    if grade in RANK:
+        return RANK[grade]
+    if grade != UNKNOWN:
+        return None
+    kinds = ENTRY_KINDS if row["entry_kind"] == UNKNOWN else (row["entry_kind"],)
+    if unknown_precondition(row) and "external_request" in kinds:
+        kinds = (*kinds, "internal_control")
+    tiers = TIERS if tier == UNKNOWN else (tier,)
+    serious = ("yes", "no") if row["serious_consequence"] == UNKNOWN else (row["serious_consequence"],)
+    return min(RANK[grade_from(k, t, s)] for k in kinds for t in tiers for s in serious)
+
+
 def route_of(row: dict[str, str], grade: str) -> str:
     verdict = row["review_verdict"]
     if verdict in {"pending", "partial"}:
@@ -263,6 +286,9 @@ def check_row(row: dict[str, str], where: str, errors: list[str]) -> None:
         error("reviewer", "must differ from author after review")
     if row["entry_kind"] != "test_only" and row["entrypoint"] == "n/a":
         error("entrypoint", "name the official server or CLI entry point")
+    elif row["entry_kind"] == "test_only" and row["entrypoint"] != "n/a":
+        error("entrypoint", "test_only means no official entry point reaches it; write n/a, or record the entry "
+              "point with the entry kind it reaches")
     marks, described = split_marks(row["impact"])
     ending = service_ending(row["impact"])
     if row["impact"] and not described:
@@ -271,8 +297,10 @@ def check_row(row: dict[str, str], where: str, errors: list[str]) -> None:
         error("impact", f"states {ending[0]} ({ending[1]!r}), which ends the service for other requests; start "
               f"impact with the {AVAILABILITY_MARK} marker (before error:, slow: or report:), so that the finding "
               "routes to the private channel after review")
-    kind = consequence_class(row["impact"])
-    if row["serious_consequence"] == "no" and kind is None:
+    kind, reason = consequence_class(row["impact"])
+    if kind is not None and not reason:
+        error("impact", f"{kind}: needs the concrete impact after it")
+    elif row["serious_consequence"] == "no" and kind is None:
         error("impact", "serious_consequence no needs impact to start with error:, slow: or report: (after the "
               f"optional markers {CROSS_REQUEST_MARK} and {AVAILABILITY_MARK}) saying why it is not serious; a "
               "wrong, incomplete or missing output of the request itself is serious (yes)")
@@ -354,12 +382,15 @@ def check_row(row: dict[str, str], where: str, errors: list[str]) -> None:
                 error("ambiguous_facts", "entry_kind=external_request contradicts a control precondition")
                 return
             readings.setdefault(field, []).append(value)
-        if grade in RANK:
+        # An unknown grade is compared by the lowest grade its facts allow, so a listed reading below all of them
+        # is still refused.
+        floor = lowest_rank(row, None if extra is None else len(extra))
+        if floor is not None:
             fields = sorted(readings)
             for values in itertools.product(*([row[f], *readings[f]] for f in fields)):
                 other = dict(row, **dict(zip(fields, values)))
                 _, other_grade = derive(other, None if extra is None else len(extra))
-                if other_grade in RANK and RANK[other_grade] < RANK[grade]:
+                if other_grade in RANK and RANK[other_grade] < floor:
                     reading = ";".join(f"{f}={v}" for f, v in zip(fields, values) if v != row[f])
                     error("ambiguous_facts", f"record the lower reading: with {reading} the grade is "
                           f"{other_grade}, the recorded facts give {grade}")
@@ -372,6 +403,25 @@ def check_row(row: dict[str, str], where: str, errors: list[str]) -> None:
         row[field] = value
 
 
+def tsv_cells(line: str) -> list[str]:
+    """Split one TSV line. A cell that is wholly quoted, with inner quotes doubled (as --write writes a cell that
+    holds a quote), is unquoted; every other cell is read as written, so prose may start with a quote."""
+    line, cells, index = line.rstrip("\r\n"), [], 0
+    while True:
+        quoted = QUOTED_CELL.match(line, index)
+        if quoted:
+            cells.append(quoted.group(1).replace('""', '"'))
+            index = quoted.end()
+        else:
+            end = line.find("\t", index)
+            end = len(line) if end == -1 else end
+            cells.append(line[index:end])
+            index = end
+        if index >= len(line):
+            return cells
+        index += 1  # the tab
+
+
 def read_table(path: Path, errors: list[str]) -> tuple[list[tuple[int, str]], list[tuple[int, dict[str, str]]]]:
     lines = list(enumerate(path.read_text(encoding="utf-8").splitlines(keepends=True), 1))
     if not lines:
@@ -382,11 +432,7 @@ def read_table(path: Path, errors: list[str]) -> tuple[list[tuple[int, str]], li
     for number, line in lines:
         if number > 1 and (not line.strip() or line.startswith("#")):
             continue
-        try:
-            values = next(csv.reader([line], delimiter="\t", strict=True))
-        except (csv.Error, StopIteration) as exc:
-            errors.append(f"ERROR {path}:{number}: invalid TSV: {exc}")
-            continue
+        values = tsv_cells(line)
         if number == 1:
             if values != HEADER:
                 errors.append(f"ERROR {path}:1: header must be " + "\t".join(HEADER))
@@ -427,7 +473,10 @@ def main() -> int:
         "a process exit, refused new requests or failure of other in-flight requests without availability: is "
         "refused; the phrase list reads words, not causes, and a missing cross_request_data: is not inferred. "
         "serious_consequence no needs impact to start with error:, slow: or report: (after the markers); yes may "
-        "not start with one of them. Review of evidence, default commands, security impact, preconditions "
+        "not start with one of them; a marker or a class with no text after it is refused. test_only needs "
+        "entrypoint n/a. An unknown grade is compared with a listed ambiguous reading by the lowest grade its "
+        "facts allow. A cell is read as written; only a wholly quoted cell with doubled inner quotes (as "
+        "--write writes it) is unquoted, and no cell holds a tab. Review of evidence, default commands, security impact, preconditions "
         "and reference-contract agreement is manual. A pending row may be structurally valid but is held."
     ))
     parser.add_argument("tsv", type=Path, metavar="TSV", help="one finding per TSV row; # examples and blank lines are skipped")

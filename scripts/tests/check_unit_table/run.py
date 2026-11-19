@@ -125,6 +125,11 @@ def main():
         plan_tsv = scratch / 'PLAN.tsv'
         plan_tsv.write_text('unit_id\tresource\n' + ''.join(f'{row[0]}\tbuffer_slots\n' for row in good))
         invoke(table, '--plan', plan_tsv, code=0, label='plan-as-tsv')
+        # Input of an outside review of 0.125.0: a TSV plan of one column is a TSV plan, and a short row is an error.
+        plan_tsv.write_text('unit_id\n' + ''.join(f'{row[0]}\n' for row in good))
+        invoke(table, '--plan', plan_tsv, code=0, label='plan-one-column-tsv')
+        plan_tsv.write_text('resource\tunit_id\n' + ''.join(f'buffer_slots\t{row[0]}\n' for row in good) + 'x\n')
+        invoke(table, '--plan', plan_tsv, code=1, contains=('no unit_id in this plan row',), label='plan-short-row')
         for row in bad:
             write(table, header, [row])
             invoke(table, '--no-plan', code=1, contains=(BAD[row[0]],), label=row[0])
@@ -148,6 +153,9 @@ def main():
             'first-not-accepted': (edit(good, 'U-01', status='pass'), 'first unit U-01 is pass, but U-02, U-03, U-04'),
             'compare-by-name-only': (edit(good, 'U-03', evidence='units/U-03/HANDBACK.txt;units/U-03/notes.tsv'),
                                      'needs its writing-compare table'),
+            # Input of an outside review of 0.125.0: only a key unit names two workers.
+            'not-key-two-owners': (edit(good, 'U-05', owner='worker-06;worker-08'),
+                                   'a unit that is not key has one worker'),
         }
         (scratch / 'units' / 'U-03' / 'notes.tsv').write_text('row_a\trow_b\n')
         for name, (rows, fragment) in cases.items():

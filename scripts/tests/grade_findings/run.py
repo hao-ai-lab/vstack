@@ -136,6 +136,45 @@ def main():
                       'hit_kind', 'reference_kind', 'review_verdict', 'injected', 'hits', 'arm_stock'):
             write(source, header, [dict(good[0], **{field: 'unknown'})])
             invoke(source, ok=False, contains=f':{field}:')
+        # Inputs an outside review of 0.125.0 sent, each graded against the documents' rules only from 0.126.0.
+        default = next(row for row in good if row['finding_id'] == 'a-default')
+        minor = next(row for row in good if row['finding_id'] == 'b-error-reply')
+        review = [
+            # Unmarked service-ending effects in the words of the private-routing section.
+            (dict(minor, impact='error: One request kills the worker process'), ':impact: states a process exit'),
+            (dict(minor, impact='error: The reply is an engine-dead error'), ':impact: states a process exit'),
+            (dict(minor, impact='error: New requests are failing'), ':impact: states refused new requests'),
+            (dict(minor, impact='error: New requests refused until a restart'), ':impact: states refused new requests'),
+            (dict(minor, impact='error: Other in-flight requests fail'),
+             ':impact: states failure of other in-flight requests'),
+            # A class with nothing after it, with or without a marker.
+            (dict(default, impact='availability: error:', route='private_report'),
+             ':impact: error: needs the concrete impact'),
+            (dict(default, impact='error:'), ':impact: error: needs the concrete impact'),
+            # An unknown grade with a listed reading below every grade its facts allow.
+            (dict(default, preconditions='unknown', ambiguous_facts='entry_kind=test_only', tier='tier0',
+                  grade='unknown', route='await_facts'), ':ambiguous_facts: record the lower reading'),
+            # test_only with an official entry point.
+            (dict(default, entry_kind='test_only', grade='D', route='not_a_product_defect'),
+             ':entrypoint: test_only means no official entry point'),
+        ]
+        for row, fragment in review:
+            write(source, header, [row])
+            invoke(source, ok=False, contains=fragment)
+        for impact in ('error: The request fails; new requests are not refused',
+                       'error: The request fails; other requests do not fail'):
+            write(source, header, [dict(minor, impact=impact)])
+            invoke(source, ok=True, contains='1 findings checked')
+        # A cell may start with a quote that does not wrap the whole cell; --write keeps it.
+        for row in (dict(default, summary='"fast" decode path leaks slots'),
+                    dict(default, default_launch_cmd='"/usr/bin/engine" serve', launch_cmd='"/usr/bin/engine" serve')):
+            source.write_text('\t'.join(header) + '\n' + '\t'.join(row[field] for field in header) + '\n')
+            invoke(source, ok=True, contains='1 findings checked')
+            written = scratch / 'quoted-out.tsv'
+            written.unlink(missing_ok=True)
+            invoke(source, '--write', written, ok=True)
+            invoke(written, ok=True, contains='1 findings checked')
+            require(read(written)[1][0]['summary'] == row['summary'], 'a leading quote changed on --write')
         # The template's commented examples are valid records with correct computed columns.
         examples = [line[2:] for line in (ROOT / 'templates/finding-record.tsv').read_text().splitlines(True)
                     if line.startswith('# ')]
@@ -150,8 +189,9 @@ def main():
         invoke(source, ok=False, contains='missing header')
         source.write_text('\t'.join(header) + '\nshort\n')
         invoke(source, ok=False, contains=f'expected {len(header)} columns')
+        # A quote that does not wrap a whole cell is text, so an unterminated one leaves a short row.
         source.write_text('\t'.join(header) + '\n"unterminated\n')
-        invoke(source, ok=False, contains='invalid TSV')
+        invoke(source, ok=False, contains=f'expected {len(header)} columns')
         source.write_bytes(b'\xff')
         invoke(source, ok=False, contains='ERROR ')
         write(source, header, [good[0], good[0]])

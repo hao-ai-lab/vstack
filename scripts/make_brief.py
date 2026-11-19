@@ -11,7 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import check_brief as cb  # noqa: E402
 
-KEY = re.compile(r"^([a-z][a-z0-9 -]*[a-z0-9]):(?:[ \t]+(.*?))?\s*$")
+KEY = re.compile(r"^([a-z](?:[a-z0-9 -]*[a-z0-9])?):(?:[ \t]+(.*?))?\s*$")  # one-letter names too, as check_brief.SLOT
 EXPR = re.compile(r"\{\{\s*(rows|header|cell)\s+of\s+([^{}\n]*?)\s*\}\}")
 CELL = re.compile(r"^(\S+)\s+column\s+(\S+)\s+where\s+([^=\s]+)=(.*)$")
 RESERVED = {"template"}
@@ -196,7 +196,8 @@ def main():
                                                 f"{named}'"))
     try:
         text = template.read_text(encoding="utf-8")
-        rules = cb.load_rules()
+        rules = cb.load_rules(template)  # the sections and fields of the template the brief is made from
+        rules.slots |= cb.load_rules().slots  # and every slot text of the base and domain templates
     except (OSError, UnicodeError, ValueError) as exc:
         problems.append((None, f"template: {exc}"))
         return fail()
