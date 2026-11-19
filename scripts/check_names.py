@@ -36,7 +36,8 @@ SUFFIXES = PYTHON | CYTHON | C_LIKE
 # Without a directory, only these suffixes mark a file name; others are too often attribute names (self.h).
 FILE_SUFFIXES = PYTHON | CYTHON | {".cu", ".cuh", ".cpp", ".cc", ".cxx", ".hpp", ".hh"}
 SKIP_DIRS = {".git", "__pycache__", "node_modules", ".venv", "venv", "build", "dist"}
-C_COMMENT = re.compile(r"//[^\n]*|/\*.*?\*/", re.S)
+# String and character literals first, so that // or /* inside a literal does not start a comment.
+C_TOKENS = re.compile(r'"(?:\\.|[^"\\\n])*"|\'(?:\\.[^\'\n]{0,8}|[^\'\\\n])\'|(//[^\n]*|/\*.*?\*/)', re.S)
 HASH_COMMENT = re.compile(r"#[^\n]*")
 BACKTICK = re.compile(r"`([^`\n]+)`")
 LITERAL = re.compile(r"\"[^\"]*\"|'[^']*'|<[^<>\s]*>|(?<![\w-])--?[A-Za-z][\w-]*")
@@ -63,10 +64,23 @@ def string_names(content):
     return names
 
 
+def strip_c_comments(text):
+    """C-like source without its comments; string literals stay, as they hold identifiers too."""
+    return C_TOKENS.sub(lambda m: " " if m.group(1) else m.group(0), text)
+
+
 def python_names(text):
     names = set()
     try:
-        for token in tokenize.generate_tokens(io.StringIO(text).readline):
+        tokens = [t for t in tokenize.generate_tokens(io.StringIO(text).readline)
+                  if t.type not in {tokenize.NL, tokenize.COMMENT}]
+        for position, token in enumerate(tokens):
+            before = tokens[position - 1].type if position else tokenize.NEWLINE
+            after = tokens[position + 1].type if position + 1 < len(tokens) else tokenize.ENDMARKER
+            if (token.type == tokenize.STRING and before in {tokenize.NEWLINE, tokenize.INDENT, tokenize.DEDENT,
+                                                             tokenize.ENCODING}
+                    and after in {tokenize.NEWLINE, tokenize.ENDMARKER}):
+                continue  # a string that is a whole statement (a docstring) is prose, not code
             if token.type == tokenize.NAME:
                 names.add(token.string)
             elif token.type == FSTRING_MIDDLE:
@@ -98,7 +112,7 @@ def build_index(source):
             elif suffix in CYTHON:
                 names |= set(IDENT.findall(HASH_COMMENT.sub("", text)))
             else:
-                names |= set(IDENT.findall(C_COMMENT.sub("", text)))
+                names |= set(IDENT.findall(strip_c_comments(text)))
     return names, paths
 
 

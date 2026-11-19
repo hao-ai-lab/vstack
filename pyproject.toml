@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "vstack"
-version = "0.125.0"
+version = "0.126.0"
 description = "Formal verification workflow and mechanical anti-reward-hacking toolkit for coding agents."
 readme = "README.md"
 license = { file = "LICENSE" }

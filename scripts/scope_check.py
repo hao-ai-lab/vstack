@@ -47,7 +47,8 @@ def matches(path, globs):
 def changed_paths():
     out = subprocess.run(["git", "-c", "gc.auto=0", "-c", "maintenance.auto=false", "-C", str(HUB), "-c", "core.quotepath=off", "status", "--porcelain=v1",
                           "--untracked-files=all"], capture_output=True, text=True, check=True).stdout
-    return sorted({line[3:].split(" -> ")[-1] for line in out.splitlines() if line})
+    # A rename changes both paths: the source is removed from where it was, so its scope is checked too.
+    return sorted({name for line in out.splitlines() if line for name in line[3:].split(" -> ")})
 
 
 def main():

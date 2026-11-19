@@ -19,7 +19,7 @@ Record `entry_kind` and the official server or CLI `entrypoint` by name:
 | `external_request` | Ordinary client traffic on the serving interface, including client cancel and disconnect. |
 | `internal_control` | An administrative or control-plane call, such as pause, cache flush, weight update or adapter load. |
 | `startup_config` | Only a launch flag or a model choice. |
-| `test_only` | No official entry point reaches it; use `entrypoint = n/a` and record the harness commands. |
+| `test_only` | No official entry point reaches it; use `entrypoint = n/a` (the grader refuses another value) and record the harness commands. |
 | `unknown` | Not yet established; the grade waits (see [grade and route](#grade-and-route)). |
 
 Record in `preconditions` what must hold besides the launch settings, as `kind:condition` items separated by `;`,
@@ -139,12 +139,14 @@ concrete impact:
 
 A record may carry both markers, in either order, before any `error:`, `slow:` or `report:` class. A marker does not
 change the grade; it changes a reportable A or B route to `private_report`. C and D stay internal; any later
-disclosure of such a finding must also use the private channel first. A marker with no text after it is refused.
+disclosure of such a finding must also use the private channel first. A marker or a class with no text after it
+is refused, so `availability: error:` and a bare `error:` are refused whatever `serious_consequence` says.
 
 The grader cannot infer a missing `cross_request_data:` marker from prose; the independent reviewer must confirm it.
 For `availability:` it refuses an unmarked record whose `impact` states a process exit (for example an engine or
-server process that exits or dies, or an engine-dead error), refused new requests (new or later requests refused or
-failing) or a failure of other in-flight requests (every or all requests failing, or a denial of service). The
+server process that exits or dies, a killed worker or an engine-dead error), refused new requests (new or later
+requests refused or failing) or a failure of other in-flight requests (every, all or other requests failing, or
+a denial of service); a negation between the words (new requests are not refused) does not count. The
 phrase list in [grade_findings.py](../scripts/grade_findings.py) reads words, not causes, and errs toward the marker:
 an impact that names such an effect, even one caused elsewhere and only met by the finding, carries the marker or is
 rewritten to state the finding's own consequence. A service-ending effect told in other words is not caught; the
@@ -179,10 +181,15 @@ When a fact allows two readings (is this interface ordinary client traffic or an
 consequence serious?), record the reading that gives the lower grade and list each other reading in
 `ambiguous_facts` as `field=value` items separated by `;`, or write `none`. Fields that may be listed:
 `entry_kind`, `serious_consequence`, `single_model_only`. The grader recomputes the grade under every combination of
-listed readings and refuses the record when any of them gives a lower grade than the recorded facts. A human settles
+listed readings and refuses the record when any of them gives a lower grade than the recorded facts; when the
+recorded facts leave the grade `unknown`, a listed reading is lower when it is below every grade those facts
+allow (for example `entry_kind=test_only`, which gives D). A human settles
 the listed readings; until then the lower grade stands.
 
-Use one header and one tab-separated row per finding; the template's `#` rows are examples, not findings.
+Use one header and one tab-separated row per finding; the template's `#` rows are examples, not findings. A
+cell is read as written, so prose may start with a quote; only a cell that is wholly quoted with its inner
+quotes doubled (`"say ""hi"""`, as `--write` writes a cell that holds a quote) is unquoted. A cell cannot hold
+a tab.
 All fact fields are required; `reviewer` may be empty while pending. `none`, `n/a` and `unknown` are values, not
 blanks, and `unknown` is accepted only where this page names it. Identifier fields (`finding_id`, `unit`, `author`,
 `reviewer`), `hit_unit`, `upstream_checked_at`, `dup_search`, `injected`, `preconditions` and `ambiguous_facts`

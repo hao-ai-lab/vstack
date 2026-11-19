@@ -127,6 +127,17 @@ def cmd_setup(args: argparse.Namespace) -> int:
 
 def cmd_gate(args: argparse.Namespace) -> int:
     script = GATES[args.gate]
+    if args.gate == "tlc-verdict":
+        # The file only defines shell functions; running it would print nothing and exit 0.
+        if len(args.args) != 2:
+            print("usage: vstack gate tlc-verdict CHECKER_LOG CHECKER_EXIT_CODE (prints the legacy label; exit 0 only "
+                  "for PASS, which is still not acceptance)", file=sys.stderr)
+            return 2
+        out = subprocess.run(["bash", "-c", 'source "$1" && tlc_verdict "$2" "$3"', "tlc-verdict", str(script),
+                              *args.args], stdout=subprocess.PIPE, text=True)
+        label = out.stdout.strip()
+        print(label)
+        return 0 if out.returncode == 0 and label == "PASS" else 1
     cmd = ([sys.executable, str(script)] if script.suffix == ".py" else ["bash", str(script)]) + args.args
     return subprocess.call(cmd)
 

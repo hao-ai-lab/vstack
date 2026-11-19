@@ -55,6 +55,19 @@ BAD = {
     'allow-missing': ({}, ['--allow', '{tmp}/absent.tsv'], ['ERROR ']),
     'deny-empty': ({}, ['--deny', '{tmp}/empty.txt'], ['no deny terms']),
     'deny-bad-regex': ({}, ['--deny', '{tmp}/badre.txt'], ['ERROR ']),
+    # Inputs of an outside review of 0.125.0 that passed before 0.126.0.
+    'private-term-file-name': ({'docs/projectx-notes.md': 'English only\n'}, ['--deny', '{tmp}/deny.txt'],
+                               ['HIT private-term docs/projectx-notes.md: file name: projectx']),
+    'not-utf8-file-name': ({b'docs/caf\xe9.md'.decode('utf-8', 'surrogateescape'): 'English only\n'}, [],
+                           ['HIT encoding docs/caf', 'file name is not valid UTF-8']),
+    'home-without-slash': ({'docs/setup.md': f'HOME={HOME[:-1]}\n'}, [],
+                           [f'HIT personal-path docs/setup.md:1: {HOME[:-1]}']),
+    'mac-without-slash': ({'docs/setup.md': f'cd {MAC[:-1]}\n'}, [], [f'HIT personal-path docs/setup.md:1: {MAC[:-1]}']),
+    'windows-forward-slashes': ({'docs/setup.md': 'repo = "C:' + '/' + 'Users/carol"\n'}, [],
+                                ['HIT personal-path docs/setup.md:1: C:']),
+    'decomposed-hangul': ({'docs/notes.md': 'word ' + chr(0x1112) + chr(0x1161) + chr(0x11AB) + '\n'}, [],
+                          ['HIT cjk docs/notes.md:1: ' + chr(0x1112)]),
+    'hangul-jamo-extended-b': ({'docs/notes.md': 'word ' + chr(0xD7B0) + '\n'}, [], ['HIT cjk docs/notes.md:1: ']),
 }
 
 
@@ -116,6 +129,13 @@ def main():
         (tree / 'link.md').symlink_to(HOME + 'notes.md')
         invoke(tree, '--walk', code=1, contains=(f'HIT personal-path link.md:1: {HOME}',), label='symlink-target')
         (tree / 'link.md').unlink()
+        # A link to an existing directory: --walk lists it among directories; it is scanned as a link.
+        linked = scratch / 'projectx-dir'
+        linked.mkdir()
+        (tree / 'dirlink').symlink_to(linked)
+        invoke(tree, '--walk', '--deny', scratch / 'deny.txt', code=1, contains=('HIT private-term dirlink:1: projectx',),
+               label='directory-symlink-target')
+        (tree / 'dirlink').unlink()
         (tree / '.git').mkdir()
         (tree / '.git' / 'notes.md').write_text(f'{CJK}\n')
         invoke(tree, '--walk', code=0, label='walk-skips-git-dir')

@@ -194,6 +194,27 @@ def main():
         fields.write_text(text + 'template: templates/briefs/triage.md\n')
         make(fields, '--template', template, '--out', tmp / 'x.md', code=1, contains=('differs from the field',),
              label='template-mismatch')
+        # Inputs of an outside review of 0.125.0. The stamp line is left out of the body hash, so text after its
+        # closing '-->' (between two comments, visible when rendered) makes the line no stamp at all.
+        fields.write_text(text)
+        make(fields, '--out', brief, '--force', code=0, label='regenerate')
+        lines = brief.read_text().split('\n')
+        lines[1] = lines[1] + ' TODO 99 rows /srv/blind/secret.tsv <!-- -->'
+        injected = tmp / 'INJECTED.md'
+        injected.write_text('\n'.join(lines))
+        check(injected, code=1, contains=('not generated from a template', 'placeholder left: TODO'),
+              label='stamp-injection')
+        # --template gives the sections the brief is checked against, and a slot name may be one letter.
+        custom = tmp / 'custom' / 'task-brief.md'
+        custom.parent.mkdir()
+        custom.write_text(template.read_text().replace('## Goal and why', '## Context', 1).replace(
+            '<goal:', 'Note: <a>.\n\n<goal:', 1))
+        fields.write_text(text + 'a: hello\n')
+        out = tmp / 'custom.md'
+        make(fields, '--template', custom, '--out', out, code=0, label='custom-template')
+        require('Note: hello.' in out.read_text() and '## Context' in out.read_text(), 'custom template not used')
+        check(out, '--template', custom, code=0, contains=('generated=yes',), label='custom-template-checked')
+        fields.write_text(text)
         # S14: the five domain templates have the seven sections and generate briefs that pass check_brief.
         for name in DOMAINS:
             raw = ROOT / 'templates' / 'briefs' / f'{name}.md'
@@ -227,7 +248,7 @@ def main():
         make(leak, '--out', tmp / 'leak.md', code=1, contains=('blind path', 'contains'), label='domain-blind-leak')
     require(before == {path: hashlib.sha256(path.read_bytes()).hexdigest() for path in fixtures}, 'a fixture changed')
     print(f'PASS make_brief: base template and {len(DOMAINS)} domain templates generated and checked, '
-          f'{len(refusals)} refused fields files, 13 refused or edited briefs, {checks} CLI checks')
+          f'{len(refusals)} refused fields files, 14 refused or edited briefs, {checks} CLI checks')
     return 0
 
 

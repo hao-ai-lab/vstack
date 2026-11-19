@@ -118,6 +118,14 @@ VARIANTS = {
     # S8: writable globs and except items.
     'except-outside': ((WRITABLE, WRITABLE + '- except `/srv/elsewhere/x.py`: not ours\n'),
                        "'except /srv/elsewhere/x.py' lies under no writable path"),
+    # Inputs of an outside review of 0.125.0 that passed before 0.126.0.
+    'regex-accepts-fail-line': ((SUFFIX, 'last line matches: `.+: .*`'), "accepts the line 'FAIL check: 1 errors'"),
+    'regex-accepts-fail-prefix': ((SUFFIX, 'last line matches: `FAIL .*`'), "accepts the line 'FAIL x'"),
+    'scheme-angle-in-command': (('check_writers.py /srv', 'check_writers.py <file:findings.tsv> /srv'),
+                                'placeholder left: <file:findings.tsv>'),
+    'scheme-angle-in-prose': (('the pinned source tree', 'the tree of <unit:U-01>'), 'placeholder left: <unit:U-01>'),
+    'stale-id-on-literal-line': ((GOAL_END, GOAL_END + ' Compare SH13.\n\n- ids: `SH[0-9][0-9]` only `SH13`\n'
+                                  '- literal: `[TBD]` for SH99'), 'id SH99 is not in the ids listed'),
 }
 # Replacements that must still pass, with a fragment of the OK line.
 GOOD_VARIANTS = {
@@ -138,6 +146,11 @@ GOOD_VARIANTS = {
     'writable-glob-except': ((WRITABLE, WRITABLE + '- `/srv/repo/scripts/check_*.py`\n'
                               '- except `/srv/repo/scripts/check_docs.py`: owned by the other worker\n'),
                              '3 writable paths'),
+    # Inputs of an outside review of 0.125.0 that were refused before 0.126.0.
+    'except-glob-under-glob': ((WRITABLE, WRITABLE + '- `/srv/repo/src/*.py`\n- except `/srv/repo/src/test_*.py`\n'),
+                               '3 writable paths'),
+    'url-autolink-kept': ((GOAL_END, GOAL_END + ' Mail <team@example.com> or see <http://example.com/a>.'),
+                          'OK brief:'),
 }
 
 
@@ -196,8 +209,14 @@ def main():
                                     '`spec_id`\n'), 'ref table must be an absolute path'),
             'ref-outside-writable': ((PRODUCE, PRODUCE + f'- ref: `/srv/elsewhere/W.tsv` column `spec` -> `{specs}` '
                                       'column `spec_id`\n'), 'ref output /srv/elsewhere/W.tsv lies outside'),
+            'stale-id-on-ref-line': ((PRODUCE, PRODUCE + '- ids: `STD-P[0-9]{2}-[0-9]{2}` only `STD-P02-14`\n'
+                                      f'- ref: `/srv/verify/out/U-01/STD-P99-01.tsv` column `spec` -> `{specs}` '
+                                      'column `spec_id`\n'), 'id STD-P99-01 is not in the ids listed'),
         }
+        one = scratch / 'one.tsv'
+        one.write_text('violation\tverdict\nV-1\tdefect\n')
         local_good = {
+            'count-one-row': ((GOAL_END, GOAL_END + f' Judge the 1 row of `{one}`.'), '1 counts'),
             'count-right': ((GOAL_END, GOAL_END + f' Judge the 27 rows of {listed}.'), '1 counts'),
             'count-where': ((GOAL_END, GOAL_END + f' Judge the {undecided} rows of {listed} where `verdict=`.'),
                             '1 counts'),
@@ -225,6 +244,24 @@ def main():
             '## Done evidence\n', '## Writable paths\n\n- `/srv/verify/out/U-01/`\n\n## Done evidence\n', 1)
         brief.write_text(order)
         invoke(brief, HW, code=1, contains=('sections out of order',))
+        # Inputs of an outside review of 0.125.0: blind paths given to the worker in a path list, after a scheme,
+        # in an extra section, in the title or through '..'.
+        hidden = text.replace('- Blind: no', '- Blind: yes\n- `/srv/blind/`: the answer key', 1)
+        for name, changed, fragment in (
+                ('blind-in-path-list', hidden.replace('python3 /srv/verify/tools/check_writers.py',
+                                                      'PYTHONPATH=/srv/ok:/srv/blind/pkg python3 /srv/verify/tools/check_writers.py', 1),
+                 'blind path /srv/blind/ contains /srv/blind/pkg'),
+                ('blind-after-scheme', hidden.replace(SOURCE, SOURCE + '- path:/srv/blind/answers.tsv is the key.\n'),
+                 'contains /srv/blind/answers.tsv'),
+                ('blind-extra-section', hidden.replace('## Hand-back', '## Notes\n\nRead /srv/blind/answers.tsv.\n\n'
+                                                       '## Hand-back', 1), "which section 'Notes'"),
+                ('blind-title', hidden.replace('slot table\n', 'slot table, from /srv/blind/answers.tsv\n', 1),
+                 "which section 'title'"),
+                ('blind-dotdot', hidden.replace(SOURCE, SOURCE + '- `/srv/ok/../blind/answers.tsv`: the key.\n'),
+                 'contains /srv/blind/answers.tsv')):
+            require(changed != hidden, f'{name}: fixture text not found')
+            brief.write_text(changed)
+            invoke(brief, HW, code=1, contains=(fragment,), label=name)
         blind = text.replace('- Blind: no', '- Blind: yes\n- `/srv/verify/answers/`: the known results', 1)
         brief.write_text(blind)
         invoke(brief, HW, code=0, contains=('blind=yes',))

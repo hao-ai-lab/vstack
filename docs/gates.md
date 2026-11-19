@@ -51,7 +51,8 @@ tlc_verdict CHECKER_LOG CHECKER_EXIT_CODE
 tlc_states CHECKER_LOG
 ```
 
-These functions come from `rerun.sh`; they run no solver. Recognized invariant, action, temporal and deadlock violations take precedence over later success. Next come the timeout exit code, then the success marker; otherwise the parser emits an error label. `tlc_states` extracts the last matching distinct-state count.
+These functions come from `rerun.sh`; they run no solver. `vstack gate tlc-verdict CHECKER_LOG CHECKER_EXIT_CODE`
+sources the file, prints the label and exits 0 only for `PASS` (1 for any other label, 2 for wrong arguments). Recognized invariant, action, temporal and deadlock violations take precedence over later success. Next come the timeout exit code, then the success marker; otherwise the parser emits an error label. `tlc_states` extracts the last matching distinct-state count.
 
 **A printed `PASS` is not acceptance.** The function can accept nonzero exits, unknown or generic errors followed by success, empty exploration, and missing or zero required action coverage. Its shell return code is not the verdict. The source caller checked exact state counts only for selected rows. Require a project runner that enforces the full fail-closed sequence, final summaries and coverage. Use the [TLC run verdict](#tlc-run-verdict) as the acceptance check for finished TLC logs; the project still supplies execution and evidence identity checks.
 
@@ -167,7 +168,8 @@ writable:
   - handoff/assigned-role.md
 ```
 
-Supply canonical project-relative POSIX paths. Globs follow Python `fnmatch`; `*` can span slashes. `--all` reads Git's tracked and untracked status and checks whether a declared role may own each changed path. It cannot identify the writer. Optional `VSTACK_MAIN_GLOBS` names a coordinator-owned file with one additional pattern per line; no file means no implicit coordinator grants. The audit neither resolves symlinks or traversal nor polices live writes. It does not replace a sandbox. The inherited Git rename and path parser requires canonical simple paths. Exit zero means only that the supplied paths or changed-path union match declared patterns.
+Supply canonical project-relative POSIX paths. Globs follow Python `fnmatch`; `*` can span slashes. `--all` reads Git's tracked and untracked status and checks whether a declared role may own each changed path,
+both the source and the destination of a rename. It cannot identify the writer. Optional `VSTACK_MAIN_GLOBS` names a coordinator-owned file with one additional pattern per line; no file means no implicit coordinator grants. The audit neither resolves symlinks or traversal nor polices live writes. It does not replace a sandbox. The inherited Git rename and path parser requires canonical simple paths. Exit zero means only that the supplied paths or changed-path union match declared patterns.
 
 ## Document check
 
@@ -218,7 +220,8 @@ python3 scripts/check_names.py SOURCE TABLE.tsv --column NAME [--column NAME] [-
 
 Read-only. At acceptance, a table whose sentences name code (property clauses, instance sentences, census rows)
 is refused when a class, function or field it names does not exist in the source tree at the pinned revision. The
-index holds identifiers of code only, not of comments, docstrings or documents, and names match whole, so an
+index holds identifiers of code only, not of comments, docstrings (a string that is a whole statement) or
+documents; a `//` or `/*` inside a string literal of C-like code does not start a comment. Names match whole, so an
 abbreviated class name that is a prefix of a real one is missing. `--help` lists the word shapes taken as code
 names. A CamelCase product or model name needs an entry in the `--allow` file (`name`, `reason`); every entry must
 be used. The check does not verify that a named method belongs to the named class.
@@ -234,8 +237,9 @@ A correction of a census row, found by a second census, a second pass or a revie
 which row of which table (`row_key`), the field, the wrong and the right value, its kind (`missed_write`,
 `not_shared`, `wrong_subsystem`, `wrong_access`, `wrong_site`, `wrong_condition`, `wrong_lifetime`), what found it
 and `path:line` evidence. With `--table`, the table must now hold the right value (a recorded correction that was
-never applied fails), a missed row must exist and a removed row must be gone; with `--source`, every cited line
-must exist. See [S0](../skills/vstack-s0-decompose/SKILL.md#2-procedure) step 4.
+never applied fails), a missed row must exist and a removed row must be gone (a `missed_write` cannot have the
+right value `(removed)`); with `--source`, every cited line must exist in a file inside the source tree, a range
+running upwards. See [S0](../skills/vstack-s0-decompose/SKILL.md#2-procedure) step 4.
 
 ## Refusal record
 
@@ -280,9 +284,15 @@ claim across the queues it was offered to; our job names sort after the other te
 Project rules forbid running Python code written inline in an agent's shell (`python3 -c ...`, `python3 -` with a
 here-document or a pipe) outside the project's resource guard. A sentence in every brief did not stop it: three
 agents each typed `python3 -` once in one evening. [`scripts/refuse_inline_python.py`](../scripts/refuse_inline_python.py)
-refuses such a command before it runs. It finds the interpreter behind `env`, `nice`, `timeout`, `taskset`,
-`sudo`, `xargs`, `uv run` and similar wrappers, after `;`, `&&`, `|` and newlines, and inside `bash -c`, `eval`,
-`find -exec`, `$(...)` and backticks; a script file, `-m MODULE`, `--version` and everything run by the guard pass.
+refuses such a command before it runs. It reads the command with the shell's quoting rules (quotes, backslashes,
+line continuations, comments, `2>/dev/null` style redirections, here-documents with quoted or escaped delimiters,
+nested substitutions) and finds the interpreter behind `env` (also `env -S` and its option clusters), `nice`,
+`timeout`, `taskset`, `sudo`, `xargs`, `flock`, `uv run` (also after global options) and similar wrappers, after
+`;`, `&&`, `|` and newlines, and inside `bash -c` (also after `--rcfile FILE`), `eval`, `find -exec`, `coproc`,
+`$(...)`, backticks, `<(...)` and here-documents a shell reads. `python3 -- -` and a program read from a file
+descriptor (`/dev/stdin`, `/dev/fd/N`, `/proc/self/fd/N`) are refused like `python3 -`. A script file (also after
+a here-document on standard input), `-m MODULE`, `--version` and everything run by the guard pass; a command that
+cannot be read (an unclosed quote) is refused when it names a Python interpreter.
 
 Install it for Claude Code as a `PreToolUse` hook on the Bash tool, in the project's `.claude/settings.json` or the
 user's `~/.claude/settings.json`, with the absolute path of the installed script and the project's guard:
@@ -308,9 +318,18 @@ user's `~/.claude/settings.json`, with the absolute path of the installed script
 The hook reads the tool call as JSON on standard input; exit 2 refuses the call and shows the reason to the agent,
 exit 0 lets it run, and unreadable input exits 1, which is reported and does not block. A harness with another
 pre-command hook can call `refuse_inline_python.py --guard GUARD --command 'TEXT'` and refuse on exit 2. Try it
-with `--command 'python3 -'` (exit 2) and `--command 'python3 tool.py'` (exit 0) after installing. It does not see
-commands a shell reads from a pipe, scripts written first and run later, aliases or functions; it is a guard rail
-for a habit, not a sandbox.
+with `--command 'python3 -'` (exit 2) and `--command 'python3 tool.py'` (exit 0) after installing.
+
+**Limits.** The hook reads text; it does not run a shell, and no list of patterns can close what follows. It
+knows the options of the wrappers named above, of bash and env and of the Python interpreter, and nothing else:
+a program it does not model that starts another program (`su -c`, `script -c`, `ssh`, `parallel`, `make`, awk's
+`system()`, `perl -e` and the like) passes. So do commands a shell reads from a pipe (`echo ... | bash`), scripts
+written first and run later, aliases and functions, variables that expand to a command (`$CMD -c ...`), a program
+file that is a link to standard input or a FIFO, and a here-document body that no shell reads. Of the ways past
+the 0.125.0 parser, those that came from reading the shell wrongly (quotes, comments, continuations,
+descriptor numbers, here-documents, substitutions) were closed by reading it
+with the shell's rules, those that came from a modelled program's options were closed for that program, and the
+rest of that class is the limit above. It is a guard rail for a habit, not a sandbox.
 
 ## Mutation gate
 
