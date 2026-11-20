@@ -65,6 +65,7 @@ See the **[model adequacy readout](docs/model-adequacy.md)** for how models are 
 
 <p>
   <a href="https://github.com/yuxuandexter"><img src="assets/contributors/yuxuandexter.png" width="56" alt="Yuxuan Zhang" title="Yuxuan Zhang (@yuxuandexter)"></a>&nbsp;
+  <a href="https://github.com/Viol2000"><img src="assets/contributors/Viol2000.png" width="56" alt="Yichao Fu" title="Yichao Fu (@Viol2000)"></a>&nbsp;
   <a href="https://github.com/alexzms"><img src="assets/contributors/alexzms.png" width="56" alt="Minshen Zhang" title="Minshen Zhang (@alexzms)"></a>&nbsp;
   <a href="https://github.com/Davids048"><img src="assets/contributors/Davids048.png" width="56" alt="Junda Su" title="Junda Su (@Davids048)"></a>&nbsp;
   <a href="https://github.com/Boreas618"><img src="assets/contributors/Boreas618.png" width="56" alt="Yi Sun" title="Yi Sun (@Boreas618)"></a>&nbsp;
@@ -80,7 +81,7 @@ Skill orchestration draws inspiration from Lauren Tan's [pstack](https://github.
 ```bibtex
 @misc{vstack2026,
   title        = {Towards Verifiable {LLM} Infra},
-  author       = {Zhang, Yuxuan and Zhang, Minshen and Su, Junda and Sun, Yi and Chen, Junda and Zhang, Hao},
+  author       = {Zhang, Yuxuan and Fu, Yichao and Zhang, Minshen and Su, Junda and Sun, Yi and Chen, Junda and Zhang, Hao},
   year         = {2026},
   month        = nov,
   howpublished = {Hao AI Lab Blog},
