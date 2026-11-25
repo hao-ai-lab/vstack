@@ -3,13 +3,16 @@
 personal paths, chat links and stray case data.
 
 Read-only. Rules, each reported as HIT <rule> <where>: <match>:
-  cjk            any CJK, kana, Hangul or full-width character (the repository is English only)
-  personal-path  /home/<name>/, /Users/<name>/ or a Windows profile path (a drive letter, then \\Users\\)
+  cjk            any CJK, kana, Hangul (also decomposed jamo) or full-width character (the repository is English
+                 only)
+  personal-path  /home/<name> or /Users/<name> (with or without a slash after it), or a Windows profile path (a
+                 drive letter, then \\Users\\ or /Users/)
   chat-link      a session, share or artifact link of a chat tool (claude.ai, chatgpt.com, gemini, ...)
   case-data      a data file (.tsv .csv .jsonl .ndjson .log .out .trace .tla .cfg .smt2) outside data/
   private-term   a term from --deny FILE (kept outside the repository: internal case names, hosts, task ids)
   encoding       a text file (no NUL byte) that is not valid UTF-8
-Paths themselves are checked for cjk and personal-path. The allow-list (default ROOT/scripts/hygiene-allow.tsv,
+Paths themselves are checked for cjk, personal-path, private-term and encoding (a name that is not valid UTF-8).
+With --walk, a symbolic link to a directory is scanned as a link (its name and target), not followed. The allow-list (default ROOT/scripts/hygiene-allow.tsv,
 header rule<TAB>path<TAB>reason) excuses hits of one rule in files matching a glob (fnmatch; * spans /); every
 entry needs a reason and must excuse at least one hit of a rule that ran. The allow-list itself is not case data.
 
@@ -27,9 +30,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-CJK = re.compile("[\u2e80-\u2fdf\u3000-\u33ff\u3400-\u4dbf\u4e00-\u9fff\ua960-\ua97f\uac00-\ud7af"
+CJK = re.compile("[\u1100-\u11ff\u2e80-\u2fdf\u3000-\u33ff\u3400-\u4dbf\u4e00-\u9fff\ua960-\ua97f\uac00-\ud7ff"
                  "\uf900-\ufaff\ufe30-\ufe4f\uff00-\uffef\U00020000-\U0003ffff]+")
-PERSONAL = re.compile(r"/home/[A-Za-z0-9._-]+/|/Users/[A-Za-z0-9._-]+/|\b[A-Za-z]:\\+Users\\+", re.I)
+PERSONAL = re.compile(r"/(?:home|Users)/[A-Za-z0-9._-]+/?|\b[A-Za-z]:[\\/]+Users[\\/]+", re.I)
 CHAT = re.compile(
     r"\b(?:claude\.ai/(?:chat|share|artifact|project|code/session_|code/artifact)"
     r"|(?:chatgpt\.com|chat\.openai\.com)/(?:c|g|share)/"
@@ -58,8 +61,10 @@ def list_files(root, walk, untracked):
     if walk:
         found = []
         for base, dirs, files in os.walk(root):
-            dirs[:] = sorted(d for d in dirs if d != ".git")
-            found += [Path(base, name).relative_to(root).as_posix() for name in sorted(files)]
+            # A symbolic link to a directory is listed among dirs and not followed; scan it as a link, as Git does.
+            links = [d for d in dirs if os.path.islink(os.path.join(base, d))]
+            dirs[:] = sorted(d for d in dirs if d != ".git" and d not in links)
+            found += [Path(base, name).relative_to(root).as_posix() for name in sorted(files + links)]
         return found
     args = ["ls-files", "-z", "--cached"] + (["--others", "--exclude-standard"] if untracked else [])
     out = git(root, *args)
@@ -138,12 +143,21 @@ def load_allow(path):
     return entries, errors
 
 
-def scan_name(name):
+def printable(text):
+    """Text with the undecodable bytes of a file name shown as escapes, so that printing it cannot fail."""
+    return text.encode("utf-8", "backslashreplace").decode("utf-8")
+
+
+def scan_name(name, deny=()):
     """Yield (rule, None, match) for the path of a file."""
-    for rule, pattern in (("cjk", CJK), ("personal-path", PERSONAL)):
+    for rule, pattern in [("cjk", CJK), ("personal-path", PERSONAL)] + [("private-term", term) for term in deny]:
         match = pattern.search(name)
         if match:
             yield rule, None, f"file name: {match.group(0)}"
+            if rule == "private-term":
+                break
+    if any("\udc80" <= char <= "\udcff" for char in name):
+        yield "encoding", None, "file name is not valid UTF-8"
     if Path(name).suffix.lower() in DATA_SUFFIXES and not name.startswith(DATA_DIR):
         yield "case-data", None, f"{Path(name).suffix} file outside {DATA_DIR}"
 
@@ -174,7 +188,7 @@ def scan_bytes(data, deny):
 
 def scan_file(root, name, deny):
     """Yield (rule, line or None, match) for one file of the tree."""
-    yield from scan_name(name)
+    yield from scan_name(name, deny)
     path = root / name
     if path.is_symlink():
         yield from scan_lines([os.readlink(path)], deny)
@@ -251,7 +265,7 @@ def main():
                 continue
             hits[rule] += 1
             hit_places.add(where)
-            print(f"HIT {rule} {where}{':' + str(line) if line else ''}: {text}")
+            print(printable(f"HIT {rule} {where}{':' + str(line) if line else ''}: {text}"))
 
     for name in files:
         try:
@@ -260,7 +274,7 @@ def main():
             errors.append(f"ERROR {name}: {exc}")
     for commit, name, blob in versions:
         where = f"{commit[:12]}:{name}"
-        report(name, where, list(scan_name(name)) + list(scan_bytes(raw[blob], deny)))
+        report(name, where, list(scan_name(name, deny)) + list(scan_bytes(raw[blob], deny)))
     for commit in commits:
         report("", f"{commit[:12]} message", list(scan_message(raw[commit], deny)), excusable=False)
     for entry in entries:
@@ -268,7 +282,7 @@ def main():
             errors.append(f"ERROR {allow_path}:{entry['line']}: allow entry {entry['rule']} {entry['glob']} "
                           "excuses no hit; remove it")
     for message in errors:
-        print(message)
+        print(printable(message))
     total = sum(hits.values())
     counts = ", ".join(f"{rule} {hits[rule]}" for rule in RULES if rule in ran)
     skipped = "" if deny else " (private-term not run: no --deny)"

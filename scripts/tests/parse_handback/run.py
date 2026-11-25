@@ -170,6 +170,33 @@ def changed_checks(scratch, text, brief, reply):
     invoke(reply, '--changed', changed, code=2, contains=('need --brief',), label='changed-needs-brief')
 
 
+def review_checks(scratch, text, brief, reply):
+    """Inputs of an outside review of 0.125.0 that passed or crashed before 0.126.0."""
+    tree = scratch / 'tree'
+    source = brief.read_text()
+    out = f'- `{scratch}/out/`\n'
+    siblings = []
+    for name in ('S1.md', 'S2.md'):
+        siblings += ['--sibling', scratch / name]
+        (scratch / name).write_text(source.replace(out, f'- `{tree}/scripts/b.py`\n'))
+    changed = scratch / 'CHANGED.txt'
+    changed.write_text(' M scripts/b.py\n')
+    reply.write_text(text)
+    invoke(reply, '--brief', brief, '--changed', changed, '--tree', tree, *siblings, code=1,
+           contains=('b.py is writable by', 'two workers may not share'), label='two-siblings-share')
+    (tree / 'MD notes.md').write_text('x\n')
+    whole = scratch / 'WHOLE.md'
+    changed.write_text('MD notes.md\n')
+    invoke(reply, '--brief', whole, '--changed', changed, '--tree', tree, code=1,
+           contains=('reads both as a git status line and as the path of an existing file',),
+           label='path-reads-as-status')
+    invalid = scratch / 'INVALID.md'
+    invalid.write_text(source.replace('last line ends with: `errors=0`', 'last line matches: `[unclosed`'))
+    invoke(reply, '--brief', invalid, code=1, contains=('is not a regular expression',), label='invalid-pattern')
+    invoke(reply, '--ref', 'out/LEADS.tsv', 'related_spec', 'specs.tsv', 'spec_id', code=0,
+           contains=('refs=1 ids_checked=3',), label='relative-ref-table')
+
+
 def main():
     names = ('brief.md', 'reply.txt', 'bad.txt')
     before = {name: hashlib.sha256((HERE / name).read_bytes()).hexdigest() for name in names}
@@ -229,6 +256,7 @@ def main():
         regex_checks(scratch, text, brief, reply)
         ref_checks(scratch, text, brief, reply)
         changed_checks(scratch, text, brief, reply)
+        review_checks(scratch, text, brief, reply)
         reply.write_bytes(b'\xff\xfe')
         invoke(reply, code=1, contains=('ERROR',), label='not-utf8')
         invoke(scratch / 'absent.txt', code=1, contains=('ERROR',), label='absent-reply')

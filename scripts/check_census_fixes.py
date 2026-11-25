@@ -15,9 +15,10 @@ Read-only. One tab-separated row per correction, under this script's header (pri
   found_by      what found it (an id: second_census, second_pass, review, run, ...)
   evidence      path:LINE[-LINE][@commit] items separated by ; each with an optional excerpt
   note          free text, may be empty
-missed_write needs field row and wrong_value (absent); not_shared needs field row and right_value (removed); the
-other kinds correct one column. With --table, a corrected row must exist exactly once with the right value, a
-missing row must now exist, a removed row must be gone. With --source, every cited path:LINE must exist.
+missed_write needs field row, wrong_value (absent) and a right_value other than (removed); not_shared needs
+field row and right_value (removed); the other kinds correct one column. With --table, a corrected row must
+exist exactly once with the right value, a missing row must now exist, a removed row must be gone. With --source,
+every cited path:LINE[-LINE] must name a file inside SOURCE and lines that exist, the range running upwards.
 """
 
 import argparse
@@ -79,9 +80,10 @@ def check_row(row, where, tables, source, error):
         error(where, "kind is one of " + ", ".join(sorted(KINDS)))
     if row["wrong_value"] == row["right_value"]:
         error(where, "wrong_value and right_value are the same")
-    if kind == "missed_write" and (field != ROW or row["wrong_value"] != ABSENT):
-        error(where, f"missed_write: field {ROW} and wrong_value {ABSENT}")
-    elif kind == "not_shared" and (field != ROW or row["right_value"] != REMOVED):
+    if kind == "missed_write" and (field != ROW or row["wrong_value"] != ABSENT or row["right_value"] == REMOVED):
+        error(where, f"missed_write: field {ROW}, wrong_value {ABSENT} and a right_value other than {REMOVED} "
+                     "(the missed row now exists)")
+    elif kind == "not_shared" and (field != ROW or row["right_value"] != REMOVED or row["wrong_value"] == ABSENT):
         error(where, f"not_shared: field {ROW} and right_value {REMOVED}")
     elif kind in KINDS - {"missed_write", "not_shared"} and (field == ROW or ABSENT in (row["wrong_value"],)
                                                             or row["right_value"] == REMOVED):
@@ -92,12 +94,12 @@ def check_row(row, where, tables, source, error):
               "(without ;)")
     elif source is not None:
         for path, first, last, _ in (match.groups() for match in found):
-            target = source / path
-            if not target.is_file():
+            target = (source / path).resolve()
+            if not target.is_relative_to(source.resolve()) or not target.is_file():
                 error(where, f"evidence {path} is not a file under {source}")
                 continue
             count = len(target.read_bytes().splitlines())
-            if int(last or first) > count or int(first) < 1:
+            if not 1 <= int(first) <= int(last or first) <= count:
                 error(where, f"evidence {path}:{first}{'-' + last if last else ''} is beyond its {count} lines")
     key = parse_key(row["row_key"])
     if key is None:
@@ -116,7 +118,7 @@ def check_row(row, where, tables, source, error):
         return
     matches = [(no, cells) for no, cells in rows
                if len(cells) == len(header) and all(cells[header.index(c)] == v for c, v in key)]
-    if row["right_value"] == REMOVED:
+    if kind == "not_shared":
         if matches:
             error(where, f"the removed row is still in {path} (line {matches[0][0]})")
     elif len(matches) != 1:

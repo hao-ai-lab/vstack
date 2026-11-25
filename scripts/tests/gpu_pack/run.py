@@ -138,6 +138,32 @@ def main():
         a, b = (json.loads((scratch / 'locked-out' / n / 'result.json').read_text()) for n in 'ab')
         require(b['started'] >= a['ended'] or a['started'] >= b['ended'], f'locked runs overlapped: {a} {b}')
 
+        # Inputs of an outside review of 0.125.0. Runs sharing a lock wait for each other, not for the job's start.
+        chain = spec(scratch / 'chain.json', [run(f'c{i}', i, str(cpu), 'sleep 1.2', limit=2, lock=lock)
+                                              for i, cpu in enumerate(slots[:3])])
+        invoke('run', chain, '--out', scratch / 'chain-out', *common, code=0, env=env, label='lock-chain')
+        for i in range(len(slots[:3])):
+            require((scratch / 'chain-out' / f'c{i}' / 'result.json').is_file(), f'no result.json for c{i}')
+        # A null lock is no lock.
+        nolock = spec(scratch / 'nolock.json', [run('n', 0, str(slots[0]), 'true', lock=None)])
+        invoke('check', nolock, code=0, label='null-lock-check')
+        invoke('run', nolock, '--out', scratch / 'nolock-out', *common, code=0, env=env, label='null-lock-run')
+        # A program that cannot start fails its run; the other run finishes and the records are written.
+        missing = spec(scratch / 'missing.json', [run('ok', 0, str(slots[0]), 'sleep 1'),
+                                                  dict(run('gone', 1, str(slots[-1]), 'true'), cmd=['/nonexistent/x'])])
+        invoke('run', missing, '--out', scratch / 'missing-out', '--claim', scratch / 'claim-missing', *common, code=1,
+               env=env, contains=('RUN ok gpu=0', 'rc=0', 'start_error=', 'runs failed: gone'), label='start-error')
+        require(json.loads((scratch / 'missing-out' / 'ok' / 'result.json').read_text())['rc'] == 0, 'ok run lost')
+        require((scratch / 'missing-out' / 'PACK.json').is_file(), 'no PACK.json after a start error')
+        require((scratch / 'claim-missing' / 'done.txt').is_file(), 'no done record after a start error')
+        # An existing output directory is refused before the claim, so another queue still runs the job.
+        taken = scratch / 'claim-out-exists'
+        invoke('run', good, '--out', out, '--claim', taken, *common, code=1, env=env,
+               contains=('exists; every job writes a new',), label='out-exists-before-claim')
+        require(not taken.exists(), 'a refused queue took the claim')
+        invoke('run', good, '--out', scratch / 'other-queue-out', '--claim', taken, *common, code=0, env=env,
+               contains=('OK pack: ',), label='other-queue-runs')
+
         # The job's own GPUs and CPUs.
         visible = dict(env, CUDA_VISIBLE_DEVICES='0,1')
         invoke('run', good, '--out', scratch / 'visible-out', *common, code=1, env=visible,
@@ -158,6 +184,8 @@ def main():
             'overlap': ([run('a', 0, '1-3', 'true'), run('b', 1, '3,4', 'true')], 'CPUs 3 are also given'),
             'unknown-field': ([dict(run('a', 0, '1', 'true'), gpus=[0, 1])], 'unknown fields gpus'),
             'relative-lock': ([run('a', 0, '1', 'true', lock='x.lock')], 'lock is an absolute path'),
+            'reversed-cpus': ([run('a', 0, '3-1', 'true')], 'has a range whose start exceeds its end'),
+            'reserved-name': ([dict(run('a', 0, '1', 'true'), name='PACK.json')], 'is reserved for the job summary'),
         }
         for name, (runs, fragment) in bad_specs.items():
             invoke('check', spec(scratch / f'{name}.json', runs), code=1, contains=(fragment,), label=name)

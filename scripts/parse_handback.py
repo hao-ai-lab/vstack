@@ -79,6 +79,11 @@ def read_changed(path, tree):
             continue
         match = PORCELAIN.match(line)
         names = [(line.strip(), False)]
+        plain = tree / unquote_path(line.strip())
+        if match and (plain.exists() or plain.is_symlink()):
+            raise ValueError(f"{path}:{no}: {line.strip()!r} reads both as a git status line and as the path of "
+                             "an existing file; pass git status --porcelain=v1 output, or one path per line "
+                             "without such names")
         if match:
             status, rest = match.groups()
             if "R" in status and " -> " in rest:
@@ -111,9 +116,11 @@ def main():
         "or a regular expression for the whole line), and every written file must lie under a writable path of "
         "the brief (globs and 'except' items honoured). Every 'ref:' of the brief and every --ref is checked: "
         "each id in that column of the output (cells split on ; , and spaces; empty, none, n/a and - skipped) "
-        "must be an id of the named table column; a missing output is an error unless the verdict is BLOCKED. "
+        "must be an id of the named table column (a relative --ref table resolves against --root); a missing "
+        "output is an error unless the verdict is BLOCKED; an invalid pattern in the brief is an error. "
         "--changed lists the files changed in a tree (git status --porcelain=v1 --untracked-files=all output, "
-        "or one path per line, relative to --tree): each must be writable by exactly one of the brief and the "
+        "or one path per line, relative to --tree; a line that reads both as a status line and as an existing path "
+        "is refused as ambiguous): each must be writable by exactly one of the brief and the "
         "--sibling briefs, and each one this brief may write must be reported as written (a deleted file or the "
         "source of a rename only needs to be writable); a directory entry fails. The parser trusts the "
         "log files themselves; it does not re-run commands. Prints the fields as TSV. "
@@ -227,9 +234,13 @@ def main():
                     error(None, f"done-evidence command not reported: {command}")
                 continue
             actual = check.get("actual")
-            ok = actual is not None and (actual.strip() == expected if mode == "exact"
-                                         else actual.rstrip().endswith(expected) if mode == "suffix"
-                                         else re.fullmatch(expected, actual.strip()) is not None)
+            try:
+                ok = actual is not None and (actual.strip() == expected if mode == "exact"
+                                             else actual.rstrip().endswith(expected) if mode == "suffix"
+                                             else re.fullmatch(expected, actual.strip()) is not None)
+            except re.error as exc:
+                error(check["line"], f"the brief's pattern for '{command}' is not a regular expression: {exc}")
+                continue
             if verdict == "PASS" and not ok:
                 rule = {"exact": "be", "suffix": "end with", "regex": "match"}[mode]
                 error(check["line"], f"verdict PASS, but the last line of '{command}' should {rule}: {expected}")
@@ -252,7 +263,7 @@ def main():
                 error(None, f"{where}: output {out_path} does not exist")
             continue
         try:
-            ids = cb.column_values(table, id_column)
+            ids = cb.column_values(table if Path(table).is_absolute() else root / table, id_column)
             header, rows = table_rows(out_path)
         except (OSError, UnicodeError, ValueError) as exc:
             error(None, f"{where}: {getattr(exc, 'strerror', None) or exc}")
@@ -283,7 +294,7 @@ def main():
                                                [str(Path(i).resolve()) for i in sibling.writable.excludes])))
         try:
             entries = read_changed(args.changed, tree)
-        except (OSError, UnicodeError) as exc:
+        except (OSError, UnicodeError, ValueError) as exc:
             error(None, f"cannot read {args.changed}: {exc}")
             entries = []
         mine_writable = getattr(brief, "resolved", cb.Writable())
@@ -301,6 +312,9 @@ def main():
             elif mine:
                 if not deleted and not any(path == w or path.is_relative_to(w) for _, w in written):
                     error(None, f"changed file {path} is not reported as written")
+            elif len(owners) > 1:
+                error(None, f"changed file {path} is writable by {', '.join(owners)}; two workers may not share a "
+                            "writable file")
             elif owners:
                 sibling_owned += 1
             else:

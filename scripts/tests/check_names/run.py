@@ -24,6 +24,10 @@ SOURCE = {
         'def free_slots(pool):\n'
         '    return pool\n'),
     'kernels/copy.cu': '// GhostKernel only in a comment\n__global__ void copy_blocks_kernel(int* slot_map) {}\n',
+    # Inputs of an outside review of 0.125.0: a // inside a string literal is not a comment, and a docstring that
+    # is one word is prose.
+    'kernels/url.cpp': 'const char* u = "http://example.com"; int real_var = 1; /* GhostBlock */ char c = \'/\';\n',
+    'engine/doc.py': '"""GhostModuleDoc"""\n\nclass Holder:\n    """GhostClassDoc"""\n    key = "slot_key"\n',
     'docs/notes.md': 'ManagerInDocs is described here but defined nowhere.\n',
 }
 GOOD = {
@@ -34,6 +38,7 @@ GOOD = {
     'g-path': 'Read at engine/spec.py:4 and kernels/copy.cu:2 at the pinned commit',
     'g-allowed': 'FlashInfer kernels read the pool after propose()',
     'g-literals': 'Calling `propose(batch)` with `"<think>"` and `--max-num-seqs 4` keeps the order',
+    'g-after-url-string': 'real_var is set once; Holder keeps slot_key',
 }
 # id: (sentence, names the check must report, in order)
 BAD = {
@@ -46,6 +51,8 @@ BAD = {
     'b-document-only': ('ManagerInDocs owns the pool', ['ManagerInDocs']),
     'b-typo': ('copy_block_kernel writes the slot map', ['copy_block_kernel']),
     'b-dotted-member': ('`MultiModuleMTPSpeculator.propose_all` runs first', ['propose_all']),
+    'b-one-word-docstring': ('GhostModuleDoc and GhostClassDoc hold the slots', ['GhostModuleDoc', 'GhostClassDoc']),
+    'b-block-comment': ('GhostBlock copies them', ['GhostBlock']),
 }
 
 
